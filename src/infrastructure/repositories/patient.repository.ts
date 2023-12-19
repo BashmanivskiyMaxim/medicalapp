@@ -4,21 +4,46 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { PatientEntity } from '../entities/patient.entity';
-import { PatientRepositoryInterface } from '../../domain/repositories/patient.repository.interface';
+import { PatientRepository } from '../../domain/repositories/patient.repository.interface';
+import { PatientModel } from 'src/domain/model/patientModel';
 
 @Injectable()
-export class PatientRepository
+export class DatabasePatientRepository
   extends BaseAbstractRepository<PatientEntity>
-  implements PatientRepositoryInterface
+  implements PatientRepository
 {
   constructor(
     @InjectRepository(PatientEntity)
-    private readonly patientEntity: Repository<PatientEntity>,
+    private readonly patientEntityRepository: Repository<PatientEntity>,
   ) {
-    super(patientEntity);
+    super(patientEntityRepository);
   }
-
-  public async findpatient(): Promise<PatientEntity | undefined> {
-    return await this.patientEntity.findOne({});
+  createPatient(patient: PatientModel): Promise<any> {
+    const patientEntity = this.patientEntityRepository.create({
+      id: patient.id,
+      accountId: { id: patient.accountId },
+      doctorId: { id: patient.doctorId },
+    });
+    return this.patientEntityRepository.save(patientEntity);
+  }
+  updatePatient(patient: PatientModel): Promise<any> {
+    return this.patientEntityRepository.update(patient.id, {
+      id: patient.id,
+      accountId: { id: patient.accountId },
+      doctorId: { id: patient.doctorId },
+    });
+  }
+  deletePatient(patient: PatientModel): Promise<any> {
+    return this.patientEntityRepository.delete(patient.id);
+  }
+  getPatient(patient: PatientModel): Promise<any> {
+    return this.patientEntityRepository.findOne({
+      where: { id: patient.id },
+    });
+  }
+  getPatients(patient: PatientModel[]): Promise<any> {
+    return this.patientEntityRepository.find({
+      where: patient.map((patient) => ({ id: patient.id })),
+    });
   }
 }

@@ -4,21 +4,38 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { MedicalHistoryEntity } from '../entities/medicalHistory.entity';
-import { MedicalHistoryRepositoryInterface } from '../../domain/repositories/medicalHistory.repository.interface';
+import { MedicalHistoryRepository } from '../../domain/repositories/medicalHistory.repository.interface';
+import { MedicalHistoryModel } from 'src/domain/model/medicalHistoryModel';
 
 @Injectable()
-export class MedicalHistoryRepository
+export class DatabaseMedicalHistoryRepository
   extends BaseAbstractRepository<MedicalHistoryEntity>
-  implements MedicalHistoryRepositoryInterface
+  implements MedicalHistoryRepository
 {
   constructor(
     @InjectRepository(MedicalHistoryEntity)
-    private readonly medicalHistoryEntity: Repository<MedicalHistoryEntity>,
+    private readonly medicalHistoryEntityRepository: Repository<MedicalHistoryEntity>,
   ) {
-    super(medicalHistoryEntity);
+    super(medicalHistoryEntityRepository);
   }
-
-  public async findmed(): Promise<MedicalHistoryEntity | undefined> {
-    return await this.medicalHistoryEntity.findOne({});
+  deleteMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
+    return this.medicalHistoryEntityRepository.delete(medicalHistory.id);
+  }
+  createMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
+    const medicalHistoryEntity = this.medicalHistoryEntityRepository.create({
+      id: medicalHistory.id,
+      patient: { id: medicalHistory.patientId },
+      medicalProcedure: { id: medicalHistory.medicalProcedureId },
+      date: medicalHistory.date,
+    });
+    return this.medicalHistoryEntityRepository.save(medicalHistoryEntity);
+  }
+  updateMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
+    return this.medicalHistoryEntityRepository.update(medicalHistory.id, {
+      id: medicalHistory.id,
+      patient: { id: medicalHistory.patientId },
+      medicalProcedure: { id: medicalHistory.medicalProcedureId },
+      date: medicalHistory.date,
+    });
   }
 }

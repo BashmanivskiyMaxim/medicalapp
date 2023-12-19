@@ -1,11 +1,9 @@
-import { BaseInterfaceRepository } from '@app/shared';
+import { DoctorModel } from '../model/doctorModel';
 
-import { DoctorEntity } from '../entities/doctor.entity';
-
-export interface DoctorRepositoryInterface
-  extends BaseInterfaceRepository<DoctorEntity> {
-  findoctor(
-    userId: number,
-    friendId: number,
-  ): Promise<DoctorEntity | undefined>;
+export interface DoctorRepository {
+  createDoctor(doctor: any): Promise<any>;
+  updateDoctor(doctor: DoctorModel): Promise<any>;
+  deleteDoctor(doctor: DoctorModel): Promise<any>;
+  getDoctor(doctor: DoctorModel): Promise<any>;
+  getDoctors(doctor: DoctorModel[]): Promise<any>;
 }

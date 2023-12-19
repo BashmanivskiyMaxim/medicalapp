@@ -1,11 +1,8 @@
-import { BaseInterfaceRepository } from '@app/shared';
+import { ContactInfoModel } from '../model/contactInfoModel';
 
-import { ContactInfoEntity } from '../entities/contactInfo.entity';
-
-export interface ContactInfoRepositoryInterface
-  extends BaseInterfaceRepository<ContactInfoEntity> {
-  findInfo(
-    userId: number,
-    friendId: number,
-  ): Promise<ContactInfoEntity | undefined>;
+export interface ContactInfoRepository {
+  createContactInfo(contactInfo: any): Promise<any>;
+  updateContactInfo(contactInfo: any): Promise<any>;
+  deleteContactInfo(contactInfo: ContactInfoModel): Promise<any>;
+  getContactInfo(contactInfo: any): Promise<any>;
 }

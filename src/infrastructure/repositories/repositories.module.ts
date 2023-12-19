@@ -11,16 +11,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MedicalProcedureEntity } from '../entities/medicalProcedure.entity';
 import { MedicalHistoryEntity } from '../entities/medicalHistory.entity';
 import { ContactInfoEntity } from '../entities/contactInfo.entity';
-import { AccountRepository } from './account.repository';
-import { AddressRepository } from './address.repository';
-import { AppointmentRepository } from './appointment.repository';
-import { ContactInfoRepository } from './contactInfo.repository';
-import { DoctorRepository } from './doctor.repository';
-import { MedicalHistoryRepository } from './medicalHistory.repository';
-import { MedicalProcedureRepository } from './medicalProcedure.repository';
-import { MessageRepository } from './message.repository';
-import { PatientRepository } from './patient.repository';
-import { ScheduleRepository } from './schedule.repository';
+import { DatabaseAccountRepository } from './account.repository';
+import { DatabaseAddressRepository } from './address.repository';
+import { DatabaseAppointmentRepository } from './appointment.repository';
+import { DatabaseContactInfoRepository } from './contactInfo.repository';
+import { DatabaseDoctorRepository } from './doctor.repository';
+import { DatabaseMedicalHistoryRepository } from './medicalHistory.repository';
+import { DatabaseMedicalProcedureRepository } from './medicalProcedure.repository';
+import { DatabaseMessageRepository } from './message.repository';
+import { DatabasePatientRepository } from './patient.repository';
+import { DatabaseScheduleRepository } from './schedule.repository';
 
 @Module({
   imports: [
@@ -39,28 +39,28 @@ import { ScheduleRepository } from './schedule.repository';
     ]),
   ],
   providers: [
-    AccountRepository,
-    AddressRepository,
-    AppointmentRepository,
-    ContactInfoRepository,
-    DoctorRepository,
-    MedicalHistoryRepository,
-    MedicalProcedureRepository,
-    MessageRepository,
-    PatientRepository,
-    ScheduleRepository,
+    DatabaseAccountRepository,
+    DatabaseAddressRepository,
+    DatabaseAppointmentRepository,
+    DatabaseContactInfoRepository,
+    DatabaseDoctorRepository,
+    DatabaseMedicalHistoryRepository,
+    DatabaseMedicalProcedureRepository,
+    DatabaseMessageRepository,
+    DatabasePatientRepository,
+    DatabaseScheduleRepository,
   ],
   exports: [
-    AccountRepository,
-    AddressRepository,
-    AppointmentRepository,
-    ContactInfoRepository,
-    DoctorRepository,
-    MedicalHistoryRepository,
-    MedicalProcedureRepository,
-    MessageRepository,
-    PatientRepository,
-    ScheduleRepository,
+    DatabaseAccountRepository,
+    DatabaseAddressRepository,
+    DatabaseAppointmentRepository,
+    DatabaseContactInfoRepository,
+    DatabaseDoctorRepository,
+    DatabaseMedicalHistoryRepository,
+    DatabaseMedicalProcedureRepository,
+    DatabaseMessageRepository,
+    DatabasePatientRepository,
+    DatabaseScheduleRepository,
   ],
 })
 export class RepositoriesModule {}

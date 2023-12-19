@@ -1,10 +1,9 @@
-import { BaseInterfaceRepository } from '@app/shared';
-import { AddressEntity } from '../entities/address.entity';
+import { AddressModel } from '../model/addressModel';
 
-export interface AddressRepositoryInterface
-  extends BaseInterfaceRepository<AddressEntity> {
-  findAddress(
-    userId: number,
-    friendId: number,
-  ): Promise<AddressEntity | undefined>;
+export interface AddressRepository {
+  createAddress(address: any): Promise<any>;
+  updateAddress(address: any): Promise<any>;
+  deleteAddress(address: any): Promise<any>;
+  getAddress(address: AddressModel): Promise<any>;
+  getAddresses(id: number[]): Promise<any>;
 }

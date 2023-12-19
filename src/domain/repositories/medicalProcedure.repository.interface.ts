@@ -1,10 +1,7 @@
-import { BaseInterfaceRepository } from '@app/shared';
-import { MedicalProcedureEntity } from '../entities/medicalProcedure.entity';
+import { MedicalProcedureModel } from '../model/medicalProcedureModel';
 
-export interface MedicalProcedureRepositoryInterface
-  extends BaseInterfaceRepository<MedicalProcedureEntity> {
-  findproc(
-    userId: number,
-    friendId: number,
-  ): Promise<MedicalProcedureEntity | undefined>;
+export interface MedicalProcedureRepository {
+  createMedicalProcedure(medicalProcedure: MedicalProcedureModel): Promise<any>;
+  updateMedicalProcedure(medicalProcedure: MedicalProcedureModel): Promise<any>;
+  deleteMedicalProcedure(medicalProcedure: MedicalProcedureModel): Promise<any>;
 }

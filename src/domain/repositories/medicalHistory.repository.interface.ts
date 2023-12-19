@@ -1,10 +1,7 @@
-import { BaseInterfaceRepository } from '@app/shared';
-import { MedicalHistoryEntity } from '../entities/medicalHistory.entity';
+import { MedicalHistoryModel } from '../model/medicalHistoryModel';
 
-export interface MedicalHistoryRepositoryInterface
-  extends BaseInterfaceRepository<MedicalHistoryEntity> {
-  findmed(
-    userId: number,
-    friendId: number,
-  ): Promise<MedicalHistoryEntity | undefined>;
+export interface MedicalHistoryRepository {
+  createMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any>;
+  updateMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any>;
+  deleteMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any>;
 }

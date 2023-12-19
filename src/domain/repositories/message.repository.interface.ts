@@ -1,9 +1,8 @@
-import { BaseInterfaceRepository, MessageEntity } from '@app/shared';
+import { MessageModel } from '../model/messageModel';
 
-export interface MessageRepositoryInterface
-  extends BaseInterfaceRepository<MessageEntity> {
-  findmess(
-    userId: number,
-    friendId: number,
-  ): Promise<MessageEntity | undefined>;
+export interface MessageRepository {
+  createMessage(message: MessageModel): Promise<any>;
+  updateMessage(message: MessageModel): Promise<any>;
+  deleteMessage(message: MessageModel): Promise<any>;
+  getMessage(message: MessageModel): Promise<any>;
 }

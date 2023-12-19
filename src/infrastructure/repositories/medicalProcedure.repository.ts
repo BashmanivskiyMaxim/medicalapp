@@ -4,21 +4,44 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { MedicalProcedureEntity } from '../entities/medicalProcedure.entity';
-import { MedicalProcedureRepositoryInterface } from '../../domain/repositories/medicalProcedure.repository.interface';
+import { MedicalProcedureRepository } from '../../domain/repositories/medicalProcedure.repository.interface';
+import { MedicalProcedureModel } from 'src/domain/model/medicalProcedureModel';
 
 @Injectable()
-export class MedicalProcedureRepository
+export class DatabaseMedicalProcedureRepository
   extends BaseAbstractRepository<MedicalProcedureEntity>
-  implements MedicalProcedureRepositoryInterface
+  implements MedicalProcedureRepository
 {
   constructor(
     @InjectRepository(MedicalProcedureEntity)
-    private readonly medicalProcedureEntity: Repository<MedicalProcedureEntity>,
+    private readonly medicalProcedureEntityRepository: Repository<MedicalProcedureEntity>,
   ) {
-    super(medicalProcedureEntity);
+    super(medicalProcedureEntityRepository);
   }
-
-  public async findproc(): Promise<MedicalProcedureEntity | undefined> {
-    return await this.medicalProcedureEntity.findOne({});
+  createMedicalProcedure(
+    medicalProcedure: MedicalProcedureModel,
+  ): Promise<any> {
+    const medicalProcedureEntity = this.medicalProcedureEntityRepository.create(
+      {
+        id: medicalProcedure.id,
+        procedureType: medicalProcedure.procedureType,
+        description: medicalProcedure.description,
+      },
+    );
+    return this.medicalProcedureEntityRepository.save(medicalProcedureEntity);
+  }
+  updateMedicalProcedure(
+    medicalProcedure: MedicalProcedureModel,
+  ): Promise<any> {
+    return this.medicalProcedureEntityRepository.update(medicalProcedure.id, {
+      id: medicalProcedure.id,
+      procedureType: medicalProcedure.procedureType,
+      description: medicalProcedure.description,
+    });
+  }
+  deleteMedicalProcedure(
+    medicalProcedure: MedicalProcedureModel,
+  ): Promise<any> {
+    return this.medicalProcedureEntityRepository.delete(medicalProcedure.id);
   }
 }

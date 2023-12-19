@@ -1,10 +1,8 @@
-import { BaseInterfaceRepository } from '@app/shared';
-import { ScheduleEntity } from '../entities/schedule.entity';
+import { ScheduleModel } from '../model/scheduleModel';
 
-export interface ScheduleRepositoryInterface
-  extends BaseInterfaceRepository<ScheduleEntity> {
-  findschedule(
-    userId: number,
-    friendId: number,
-  ): Promise<ScheduleEntity | undefined>;
+export interface ScheduleRepository {
+  createSchedule(schedule: ScheduleModel): Promise<any>;
+  updateSchedule(schedule: ScheduleModel): Promise<any>;
+  deleteSchedule(schedule: ScheduleModel): Promise<any>;
+  getSchedule(schedule: ScheduleModel): Promise<any>;
 }
