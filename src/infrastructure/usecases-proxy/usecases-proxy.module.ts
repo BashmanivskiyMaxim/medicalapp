@@ -13,6 +13,18 @@ import { DatabaseAddressRepository } from '../repositories/address.repository';
 import { addAddressUseCases } from 'src/usecases/address/addAddress.usecases';
 import { DatabaseAppointmentRepository } from '../repositories/appointment.repository';
 import { addAppointmentUseCases } from 'src/usecases/appointment/addAppointment.usecases';
+import { DatabaseAccountRepository } from '../repositories/account.repository';
+import { addAccountUseCases } from 'src/usecases/account/addAccount.usecases';
+import { DatabaseContactInfoRepository } from '../repositories/contactInfo.repository';
+import { addContactInfoUseCases } from 'src/usecases/contactInfo/addContactInfo.usecases';
+import { DatabaseMedicalHistoryRepository } from '../repositories/medicalHistory.repository';
+import { addMedicalHistoryUseCases } from 'src/usecases/medicalHistory/addMedicalHistory.usecases';
+import { DatabaseMedicalProcedureRepository } from '../repositories/medicalProcedure.repository';
+import { addMedicalProcedureUseCases } from 'src/usecases/medicalProcedure/addMedicalProcedure.usecases';
+import { DatabaseScheduleRepository } from '../repositories/schedule.repository';
+import { addScheduleUseCases } from 'src/usecases/schedule/addSchedule.usecases';
+import { DatabaseMessageRepository } from '../repositories/message.repository';
+import { addMessageUseCases } from 'src/usecases/message/addMessage.usecases';
 
 @Module({
   imports: [
@@ -27,6 +39,13 @@ export class UsecasesProxyModule {
   static POST_PATIENT_USECASES_PROXY = 'postPatientUseCasesProxy';
   static POST_ADDRESS_USECASES_PROXY = 'postAddressUseCasesProxy';
   static POST_APPOINTMENT_USECASES_PROXY = 'postAppointmentUseCasesProxy';
+  static POST_MEDICALHISTORY_USECASES_PROXY = 'postMedicalHistoryUseCasesProxy';
+  static POST_MEDICALPROCEDURE_USECASES_PROXY =
+    'postMedicalProcedureUseCasesProxy';
+  static POST_MESSAGE_USECASES_PROXY = 'postMessageUseCasesProxy';
+  static POST_SCHEDULE_USECASES_PROXY = 'postScheduleUseCasesProxy';
+  static POST_ACCOUNT_USECASES_PROXY = 'postAccountUseCasesProxy';
+  static POST_CONTACTINFO_USECASES_PROXY = 'postContactInfoUseCasesProxy';
 
   static regiter(): DynamicModule {
     return {
@@ -79,12 +98,96 @@ export class UsecasesProxyModule {
               ),
             ),
         },
+        {
+          inject: [LoggerService, DatabaseAccountRepository],
+          provide: UsecasesProxyModule.POST_ACCOUNT_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseAccountRepository: DatabaseAccountRepository,
+          ) =>
+            new UseCaseProxy(
+              new addAccountUseCases(loggerService, databaseAccountRepository),
+            ),
+        },
+        {
+          inject: [LoggerService, DatabaseContactInfoRepository],
+          provide: UsecasesProxyModule.POST_CONTACTINFO_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseContactInfoRepository: DatabaseContactInfoRepository,
+          ) =>
+            new UseCaseProxy(
+              new addContactInfoUseCases(
+                loggerService,
+                databaseContactInfoRepository,
+              ),
+            ),
+        },
+        {
+          inject: [LoggerService, DatabaseMedicalHistoryRepository],
+          provide: UsecasesProxyModule.POST_MEDICALHISTORY_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseMedicalHistoryRepository: DatabaseMedicalHistoryRepository,
+          ) =>
+            new UseCaseProxy(
+              new addMedicalHistoryUseCases(
+                loggerService,
+                databaseMedicalHistoryRepository,
+              ),
+            ),
+        },
+        {
+          inject: [LoggerService, DatabaseMedicalProcedureRepository],
+          provide: UsecasesProxyModule.POST_MEDICALPROCEDURE_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseMedicalProcedureRepository: DatabaseMedicalProcedureRepository,
+          ) =>
+            new UseCaseProxy(
+              new addMedicalProcedureUseCases(
+                loggerService,
+                databaseMedicalProcedureRepository,
+              ),
+            ),
+        },
+        {
+          inject: [LoggerService, DatabaseScheduleRepository],
+          provide: UsecasesProxyModule.POST_SCHEDULE_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseScheduleRepository: DatabaseScheduleRepository,
+          ) =>
+            new UseCaseProxy(
+              new addScheduleUseCases(
+                loggerService,
+                databaseScheduleRepository,
+              ),
+            ),
+        },
+        {
+          inject: [LoggerService, DatabaseMessageRepository],
+          provide: UsecasesProxyModule.POST_MESSAGE_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseMessageRepository: DatabaseMessageRepository,
+          ) =>
+            new UseCaseProxy(
+              new addMessageUseCases(loggerService, databaseMessageRepository),
+            ),
+        },
       ],
       exports: [
         UsecasesProxyModule.POST_DOCTOR_USECASES_PROXY,
         UsecasesProxyModule.POST_PATIENT_USECASES_PROXY,
         UsecasesProxyModule.POST_ADDRESS_USECASES_PROXY,
         UsecasesProxyModule.POST_APPOINTMENT_USECASES_PROXY,
+        UsecasesProxyModule.POST_ACCOUNT_USECASES_PROXY,
+        UsecasesProxyModule.POST_CONTACTINFO_USECASES_PROXY,
+        UsecasesProxyModule.POST_MEDICALHISTORY_USECASES_PROXY,
+        UsecasesProxyModule.POST_MEDICALPROCEDURE_USECASES_PROXY,
+        UsecasesProxyModule.POST_SCHEDULE_USECASES_PROXY,
+        UsecasesProxyModule.POST_MESSAGE_USECASES_PROXY,
       ],
     };
   }
