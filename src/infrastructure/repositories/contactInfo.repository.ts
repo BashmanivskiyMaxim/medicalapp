@@ -21,7 +21,7 @@ export class DatabaseContactInfoRepository
   createContactInfo(contactInfo: ContactInfoModel): Promise<any> {
     const contactInfoEntity = this.contactInfoEntityRepository.create({
       id: contactInfo.id,
-      accountId: { id: contactInfo.accountId },
+      account: { id: contactInfo.accountId },
       contactNumber: contactInfo.contactNumber,
     });
     return this.contactInfoEntityRepository.save(contactInfoEntity);
@@ -29,7 +29,7 @@ export class DatabaseContactInfoRepository
   updateContactInfo(contactInfo: ContactInfoModel): Promise<any> {
     return this.contactInfoEntityRepository.update(contactInfo.id, {
       id: contactInfo.id,
-      accountId: { id: contactInfo.accountId },
+      account: { id: contactInfo.accountId },
       contactNumber: contactInfo.contactNumber,
     });
   }

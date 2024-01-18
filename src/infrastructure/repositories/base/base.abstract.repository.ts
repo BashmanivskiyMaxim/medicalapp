@@ -21,6 +21,7 @@ export abstract class BaseAbstractRepository<T extends HasId>
   }
 
   public async save(data: DeepPartial<T>): Promise<T> {
+    console.log(data);
     return await this.entity.save(data);
   }
   public async saveMany(data: DeepPartial<T>[]): Promise<T[]> {

@@ -21,16 +21,16 @@ export class DatabasePatientRepository
   createPatient(patient: PatientModel): Promise<any> {
     const patientEntity = this.patientEntityRepository.create({
       id: patient.id,
-      accountId: { id: patient.accountId },
-      doctorId: { id: patient.doctorId },
+      account: { id: patient.accountId },
+      doctor: { id: patient.doctorId },
     });
     return this.patientEntityRepository.save(patientEntity);
   }
   updatePatient(patient: PatientModel): Promise<any> {
     return this.patientEntityRepository.update(patient.id, {
       id: patient.id,
-      accountId: { id: patient.accountId },
-      doctorId: { id: patient.doctorId },
+      account: { id: patient.accountId },
+      doctor: { id: patient.doctorId },
     });
   }
   deletePatient(patient: PatientModel): Promise<any> {

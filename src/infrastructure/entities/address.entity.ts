@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { AccountEntity } from './account.entity';
 
 @Entity('address')
@@ -9,6 +15,7 @@ export class AddressEntity {
   @Column()
   address: string;
 
-  @ManyToOne(() => AccountEntity, (account) => account.id)
-  accountId: AccountEntity;
+  @OneToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id' })
+  account: AccountEntity;
 }

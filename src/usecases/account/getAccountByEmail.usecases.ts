@@ -1,16 +1,14 @@
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { AccountModel } from 'src/domain/model/accountModel';
 import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
-import { AccountEntity } from 'src/infrastructure/entities/account.entity';
 
-export class addAccountUseCases {
+export class getAccountByEmailUseCases {
   constructor(
     private readonly logger: ILogger,
     private readonly AccountRepository: AccountRepository,
   ) {}
-  async execute(data: AccountModel): Promise<AccountEntity> {
-    const account = new AccountEntity();
-    //account.id = data.id;
+  async execute(data: AccountModel): Promise<AccountModel> {
+    const account = new AccountModel();
     account.email = data.email;
     account.password = data.password;
     account.username = data.username;
@@ -18,9 +16,11 @@ export class addAccountUseCases {
     account.lastName = data.lastName;
     account.accountType = data.accountType;
 
-    const result = await this.AccountRepository.createAccount(account);
+    const result = await this.AccountRepository.findAccountByEmail(
+      account.email,
+    );
     this.logger.log(
-      'addAccountUseCases execute',
+      'getAccountUseCases execute',
       'New account have been inserted',
     );
     return result;

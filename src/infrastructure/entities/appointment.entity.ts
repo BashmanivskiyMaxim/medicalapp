@@ -9,7 +9,7 @@ import { PatientEntity } from './patient.entity';
 import { DoctorEntity } from './doctor.entity';
 import { ScheduleEntity } from './schedule.entity';
 
-@Entity()
+@Entity('appointment')
 export class AppointmentEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -26,12 +26,12 @@ export class AppointmentEntity {
   @JoinColumn({ name: 'schedule_id' })
   schedule: ScheduleEntity;
 
-  @Column()
-  appointmentDate: Date;
+  @Column({ name: 'appointmentDate' })
+  appointmentDate: string;
 
-  @Column()
+  @Column({ name: 'appointmentTime' })
   appointmentTime: string;
 
-  @Column()
+  @Column({ name: 'reason' })
   reason: string;
 }

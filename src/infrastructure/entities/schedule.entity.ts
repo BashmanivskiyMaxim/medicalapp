@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { DoctorEntity } from './doctor.entity';
 
 @Entity('schedule')
@@ -6,15 +12,16 @@ export class ScheduleEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @ManyToOne(() => DoctorEntity)
+  @JoinColumn({ name: 'doctor_id' })
+  doctor: DoctorEntity;
+
+  @Column({ name: 'dayOfWeek' })
   dayOfWeek: string;
 
-  @Column({ type: 'time' })
+  @Column({ name: 'startTime' })
   startTime: string;
 
-  @Column({ type: 'time' })
+  @Column({ name: 'endTime' })
   endTime: string;
-
-  @ManyToOne(() => DoctorEntity, (doctor) => doctor.id)
-  doctorId: DoctorEntity;
 }

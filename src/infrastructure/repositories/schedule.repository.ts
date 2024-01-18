@@ -24,7 +24,7 @@ export class DatabaseScheduleRepository
       dayOfWeek: schedule.dayOfWeek,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      doctorId: { id: schedule.doctorId },
+      doctor: { id: schedule.doctorId },
     });
     return this.scheduleEntityRepository.save(scheduleEntity);
   }
@@ -34,7 +34,7 @@ export class DatabaseScheduleRepository
       dayOfWeek: schedule.dayOfWeek,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      doctorId: { id: schedule.doctorId },
+      doctor: { id: schedule.doctorId },
     });
   }
   deleteSchedule(schedule: ScheduleModel): Promise<any> {

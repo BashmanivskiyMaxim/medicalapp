@@ -26,6 +26,7 @@ export class DatabaseMedicalProcedureRepository
         id: medicalProcedure.id,
         procedureType: medicalProcedure.procedureType,
         description: medicalProcedure.description,
+        medicalHistory: { id: medicalProcedure.id },
       },
     );
     return this.medicalProcedureEntityRepository.save(medicalProcedureEntity);

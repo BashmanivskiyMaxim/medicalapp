@@ -21,21 +21,21 @@ export class DatabaseMedicalHistoryRepository
   deleteMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
     return this.medicalHistoryEntityRepository.delete(medicalHistory.id);
   }
+
   createMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
     const medicalHistoryEntity = this.medicalHistoryEntityRepository.create({
       id: medicalHistory.id,
       patient: { id: medicalHistory.patientId },
-      medicalProcedure: { id: medicalHistory.medicalProcedureId },
-      date: medicalHistory.date,
+      date: medicalHistory.date.toISOString(), // Convert date to string
     });
     return this.medicalHistoryEntityRepository.save(medicalHistoryEntity);
   }
+
   updateMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
     return this.medicalHistoryEntityRepository.update(medicalHistory.id, {
       id: medicalHistory.id,
       patient: { id: medicalHistory.patientId },
-      medicalProcedure: { id: medicalHistory.medicalProcedureId },
-      date: medicalHistory.date,
+      date: medicalHistory.date.toISOString(), // Convert date to string
     });
   }
 }

@@ -1,13 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { PatientEntity } from './patient.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { AccountEntity } from './account.entity';
 
-@Entity()
+@Entity('doctor')
 export class DoctorEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column()
-  accountId: number;
 
   @Column()
   specialty: string;
@@ -15,6 +18,7 @@ export class DoctorEntity {
   @Column()
   qualification: string;
 
-  @OneToMany(() => PatientEntity, (patient) => patient.id)
-  patients: PatientEntity[];
+  @OneToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id' })
+  account: AccountEntity;
 }

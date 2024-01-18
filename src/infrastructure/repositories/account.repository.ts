@@ -18,7 +18,9 @@ export class DatabaseAccountRepository
     super(AccountEntityRepository);
   }
   createAccount(data: AccountModel): Promise<any> {
+    console.log(data);
     const account = this.AccountEntityRepository.create(data);
+    console.log(account);
     return this.AccountEntityRepository.save(account);
   }
   findAccountByEmail(email: string): Promise<any> {

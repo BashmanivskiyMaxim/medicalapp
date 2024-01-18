@@ -2,8 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   JoinColumn,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { PatientEntity } from './patient.entity';
 import { MedicalProcedureEntity } from './medicalProcedure.entity';
@@ -17,10 +18,12 @@ export class MedicalHistoryEntity {
   @JoinColumn({ name: 'patient_id' })
   patient: PatientEntity;
 
-  @ManyToOne(() => MedicalProcedureEntity)
-  @JoinColumn({ name: 'medical_procedure_id' })
-  medicalProcedure: MedicalProcedureEntity;
+  @Column({ name: 'date' })
+  date: string;
 
-  @Column()
-  date: Date;
+  @OneToMany(
+    () => MedicalProcedureEntity,
+    (procedure) => procedure.medicalHistory,
+  )
+  procedures: MedicalProcedureEntity[];
 }

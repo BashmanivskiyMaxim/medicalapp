@@ -1,14 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { AccountEntity } from './account.entity';
 
-@Entity('contactInfo')
+@Entity('contact_info')
 export class ContactInfoEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => AccountEntity, (account) => account.id)
-  accountId: AccountEntity;
-
   @Column()
   contactNumber: string;
+
+  @OneToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id' })
+  account: AccountEntity;
 }

@@ -2,8 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AccountModel } from 'src/domain/model/accountModel';
 
 export class AccountPresenter {
-  @ApiProperty()
-  id: number;
+  //@ApiProperty()
+  //id: number;
   @ApiProperty()
   username: string;
   @ApiProperty()
@@ -18,7 +18,7 @@ export class AccountPresenter {
   accountType: string;
 
   constructor(account: AccountModel) {
-    this.id = account.id;
+    //this.id = account.id;
     this.username = account.username;
     this.password = account.password;
     this.email = account.email;

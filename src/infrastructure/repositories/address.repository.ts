@@ -24,7 +24,7 @@ export class DatabaseAddressRepository
   getAddresses(accountId: any): Promise<any> {
     return this.addressEntity.find({
       where: {
-        accountId: accountId,
+        account: accountId,
       },
     });
   }

@@ -21,20 +21,18 @@ export class DatabaseDoctorRepository
   createDoctor(doctor: DoctorModel): Promise<any> {
     const doctorEntity = this.doctorEntityRepository.create({
       id: doctor.id,
-      accountId: doctor.accountId,
+      account: { id: doctor.accountId }, // Assign the account property as an object with the id property
       specialty: doctor.specialty,
       qualification: doctor.qualification,
-      patients: doctor.patients.map((patient) => ({ id: patient.id })),
     });
     return this.doctorEntityRepository.save(doctorEntity);
   }
   updateDoctor(doctor: DoctorModel): Promise<any> {
     return this.doctorEntityRepository.update(doctor.id, {
       id: doctor.id,
-      accountId: doctor.accountId,
+      account: { id: doctor.accountId }, // Assign the account property as an object with the id property
       specialty: doctor.specialty,
       qualification: doctor.qualification,
-      patients: doctor.patients.map((patient) => ({ id: patient.id })),
     });
   }
   deleteDoctor(doctor: DoctorModel): Promise<any> {

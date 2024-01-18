@@ -25,6 +25,7 @@ import { DatabaseScheduleRepository } from '../repositories/schedule.repository'
 import { addScheduleUseCases } from 'src/usecases/schedule/addSchedule.usecases';
 import { DatabaseMessageRepository } from '../repositories/message.repository';
 import { addMessageUseCases } from 'src/usecases/message/addMessage.usecases';
+import { getAccountByEmailUseCases } from 'src/usecases/account/getAccountByEmail.usecases';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ export class UsecasesProxyModule {
   static POST_SCHEDULE_USECASES_PROXY = 'postScheduleUseCasesProxy';
   static POST_ACCOUNT_USECASES_PROXY = 'postAccountUseCasesProxy';
   static POST_CONTACTINFO_USECASES_PROXY = 'postContactInfoUseCasesProxy';
+  static GET_ACCOUNT_BY_EMAIL_USECASES_PROXY = 'getAccountByEmailUseCasesProxy';
 
   static regiter(): DynamicModule {
     return {
@@ -60,6 +62,20 @@ export class UsecasesProxyModule {
           ) =>
             new UseCaseProxy(
               new addDoctorUseCases(loggerService, databaseDoctorRepository),
+            ),
+        },
+        {
+          inject: [LoggerService, DatabaseAccountRepository],
+          provide: UsecasesProxyModule.GET_ACCOUNT_BY_EMAIL_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseAccountRepository: DatabaseAccountRepository,
+          ) =>
+            new UseCaseProxy(
+              new getAccountByEmailUseCases(
+                loggerService,
+                databaseAccountRepository,
+              ),
             ),
         },
         {
@@ -188,6 +204,7 @@ export class UsecasesProxyModule {
         UsecasesProxyModule.POST_MEDICALPROCEDURE_USECASES_PROXY,
         UsecasesProxyModule.POST_SCHEDULE_USECASES_PROXY,
         UsecasesProxyModule.POST_MESSAGE_USECASES_PROXY,
+        UsecasesProxyModule.GET_ACCOUNT_BY_EMAIL_USECASES_PROXY,
       ],
     };
   }
