@@ -20,7 +20,7 @@ export class AccountPresenter {
   constructor(account: AccountModel) {
     //this.id = account.id;
     this.username = account.username;
-    this.password = account.password;
+    //this.password = account.password;
     this.email = account.email;
     this.firstName = account.firstName;
     this.lastName = account.lastName;

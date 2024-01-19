@@ -26,10 +26,20 @@ import { addScheduleUseCases } from 'src/usecases/schedule/addSchedule.usecases'
 import { DatabaseMessageRepository } from '../repositories/message.repository';
 import { addMessageUseCases } from 'src/usecases/message/addMessage.usecases';
 import { getAccountByEmailUseCases } from 'src/usecases/account/getAccountByEmail.usecases';
+import { JwtTokenService } from '../services/jwt/jwt.service';
+import { EnvironmentConfigService } from '../config/environment-config/environment-config.service';
+import { BcryptService } from '../services/bcrypt/bcrypt.service';
+import { LoginUseCases } from 'src/usecases/account/login.usecases';
+import { IsAuthenticatedUseCases } from 'src/usecases/account/isAuthenticated.usecases';
+import { LogoutUseCases } from 'src/usecases/account/logout.usecases';
+import { JwtModule } from '../services/jwt/jwt.module';
+import { BcryptModule } from '../services/bcrypt/bcrypt.module';
 
 @Module({
   imports: [
     LoggerModule,
+    JwtModule,
+    BcryptModule,
     EnvironmentConfigModule,
     RepositoriesModule,
     ExceptionsModule,
@@ -48,6 +58,9 @@ export class UsecasesProxyModule {
   static POST_ACCOUNT_USECASES_PROXY = 'postAccountUseCasesProxy';
   static POST_CONTACTINFO_USECASES_PROXY = 'postContactInfoUseCasesProxy';
   static GET_ACCOUNT_BY_EMAIL_USECASES_PROXY = 'getAccountByEmailUseCasesProxy';
+  static LOGIN_USECASES_PROXY = 'LoginUseCasesProxy';
+  static IS_AUTHENTICATED_USECASES_PROXY = 'IsAuthenticatedUseCasesProxy';
+  static LOGOUT_USECASES_PROXY = 'LogoutUseCasesProxy';
 
   static regiter(): DynamicModule {
     return {
@@ -115,14 +128,29 @@ export class UsecasesProxyModule {
             ),
         },
         {
-          inject: [LoggerService, DatabaseAccountRepository],
+          inject: [
+            LoggerService,
+            JwtTokenService,
+            EnvironmentConfigService,
+            DatabaseAccountRepository,
+            BcryptService,
+          ],
           provide: UsecasesProxyModule.POST_ACCOUNT_USECASES_PROXY,
           useFactory: (
-            loggerService: LoggerService,
-            databaseAccountRepository: DatabaseAccountRepository,
+            logger: LoggerService,
+            jwtTokenService: JwtTokenService,
+            config: EnvironmentConfigService,
+            userRepo: DatabaseAccountRepository,
+            bcryptService: BcryptService,
           ) =>
             new UseCaseProxy(
-              new addAccountUseCases(loggerService, databaseAccountRepository),
+              new addAccountUseCases(
+                logger,
+                jwtTokenService,
+                config,
+                userRepo,
+                bcryptService,
+              ),
             ),
         },
         {
@@ -192,6 +220,43 @@ export class UsecasesProxyModule {
               new addMessageUseCases(loggerService, databaseMessageRepository),
             ),
         },
+        {
+          inject: [
+            LoggerService,
+            JwtTokenService,
+            EnvironmentConfigService,
+            DatabaseAccountRepository,
+            BcryptService,
+          ],
+          provide: UsecasesProxyModule.LOGIN_USECASES_PROXY,
+          useFactory: (
+            logger: LoggerService,
+            jwtTokenService: JwtTokenService,
+            config: EnvironmentConfigService,
+            userRepo: DatabaseAccountRepository,
+            bcryptService: BcryptService,
+          ) =>
+            new UseCaseProxy(
+              new LoginUseCases(
+                logger,
+                jwtTokenService,
+                config,
+                userRepo,
+                bcryptService,
+              ),
+            ),
+        },
+        {
+          inject: [DatabaseAccountRepository],
+          provide: UsecasesProxyModule.IS_AUTHENTICATED_USECASES_PROXY,
+          useFactory: (userRepo: DatabaseAccountRepository) =>
+            new UseCaseProxy(new IsAuthenticatedUseCases(userRepo)),
+        },
+        {
+          inject: [],
+          provide: UsecasesProxyModule.LOGOUT_USECASES_PROXY,
+          useFactory: () => new UseCaseProxy(new LogoutUseCases()),
+        },
       ],
       exports: [
         UsecasesProxyModule.POST_DOCTOR_USECASES_PROXY,
@@ -205,6 +270,9 @@ export class UsecasesProxyModule {
         UsecasesProxyModule.POST_SCHEDULE_USECASES_PROXY,
         UsecasesProxyModule.POST_MESSAGE_USECASES_PROXY,
         UsecasesProxyModule.GET_ACCOUNT_BY_EMAIL_USECASES_PROXY,
+        UsecasesProxyModule.LOGIN_USECASES_PROXY,
+        UsecasesProxyModule.IS_AUTHENTICATED_USECASES_PROXY,
+        UsecasesProxyModule.LOGOUT_USECASES_PROXY,
       ],
     };
   }

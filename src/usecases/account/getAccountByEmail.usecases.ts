@@ -10,7 +10,7 @@ export class getAccountByEmailUseCases {
   async execute(data: AccountModel): Promise<AccountModel> {
     const account = new AccountModel();
     account.email = data.email;
-    account.password = data.password;
+    //account.password = data.password;
     account.username = data.username;
     account.firstName = data.firstName;
     account.lastName = data.lastName;

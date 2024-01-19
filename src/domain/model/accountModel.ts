@@ -1,9 +1,9 @@
 export class AccountModel {
-  id: number;
+  id?: number;
   createDate: Date;
   updatedDate: Date;
   lastLogin: Date;
-  hashRefreshToken: string;
+  hashRefreshToken?: string;
   username: string;
   email: string;
   firstName: string;
