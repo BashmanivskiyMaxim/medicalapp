@@ -74,7 +74,7 @@ export class DatabaseAccountRepository
     return this.AccountEntityRepository.findOne({ where: { id } });
   }
   updateAccountById(id: string, data: any): Promise<any> {
-    return this.AccountEntityRepository.update(id, data);
+    return this.AccountEntityRepository.save({ id, ...data });
   }
   deleteAccountById(id: string): Promise<any> {
     return this.AccountEntityRepository.delete(id);

@@ -7,6 +7,7 @@ import { JWTConfig } from 'src/domain/config/jwt.interface';
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { UserM } from 'src/domain/model/accountModel';
 import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
+import { ForbiddenException } from '@nestjs/common';
 
 export class addAccountUseCases {
   constructor(
@@ -16,17 +17,21 @@ export class addAccountUseCases {
     private readonly userRepository: AccountRepository,
     private readonly bcryptService: IBcryptService,
   ) {}
-  async execute(data: UserM): Promise<UserM> {
+  async execute(data: UserM, isAdmin?: string): Promise<UserM> {
+    const hashedPassword = await this.bcryptService.hash(data.password);
+
     const account = new UserM();
     account.email = data.email;
-    account.password = data.password;
+    account.password = hashedPassword;
     account.username = data.username;
     account.firstName = data.firstName;
     account.lastName = data.lastName;
     account.createDate = new Date();
     account.updatedDate = new Date();
     account.lastLogin = new Date();
-    account.accountType = 'user';
+
+    if (isAdmin === 'admin') account.accountType = 'doctor';
+    else account.accountType = 'user';
 
     const result = await this.userRepository.createAccount(account);
     this.logger.log(
@@ -34,6 +39,16 @@ export class addAccountUseCases {
       'New account have been inserted',
     );
     return result;
+  }
+
+  async executeDoctor(data: UserM, isAdmin?: string): Promise<UserM> {
+    if (isAdmin === 'admin') {
+      return this.execute(data, 'admin');
+    } else {
+      throw new ForbiddenException(
+        'Permission denied. Only administrators can execute this operation.',
+      );
+    }
   }
   async getCookieWithJwtToken(username: string) {
     this.logger.log(

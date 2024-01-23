@@ -34,6 +34,8 @@ import { IsAuthenticatedUseCases } from 'src/usecases/account/isAuthenticated.us
 import { LogoutUseCases } from 'src/usecases/account/logout.usecases';
 import { JwtModule } from '../services/jwt/jwt.module';
 import { BcryptModule } from '../services/bcrypt/bcrypt.module';
+import { DeleteUseCases } from 'src/usecases/account/deleteMyAccount.usecases';
+import { UpdateAccountUseCases } from 'src/usecases/account/update_account.usecases';
 
 @Module({
   imports: [
@@ -61,6 +63,8 @@ export class UsecasesProxyModule {
   static LOGIN_USECASES_PROXY = 'LoginUseCasesProxy';
   static IS_AUTHENTICATED_USECASES_PROXY = 'IsAuthenticatedUseCasesProxy';
   static LOGOUT_USECASES_PROXY = 'LogoutUseCasesProxy';
+  static DELETE_ACCOUNT_USECASES_PROXY = 'DeleteAccountUseCasesProxy';
+  static UPDATE_ACCOUNT_USECASES_PROXY = 'UpdateAccountUseCasesProxy';
 
   static regiter(): DynamicModule {
     return {
@@ -247,6 +251,22 @@ export class UsecasesProxyModule {
             ),
         },
         {
+          inject: [LoggerService, DatabaseAccountRepository],
+          provide: UsecasesProxyModule.DELETE_ACCOUNT_USECASES_PROXY,
+          useFactory: (
+            logger: LoggerService,
+            userRepo: DatabaseAccountRepository,
+          ) => new UseCaseProxy(new DeleteUseCases(logger, userRepo)),
+        },
+        {
+          inject: [LoggerService, DatabaseAccountRepository],
+          provide: UsecasesProxyModule.UPDATE_ACCOUNT_USECASES_PROXY,
+          useFactory: (
+            logger: LoggerService,
+            userRepo: DatabaseAccountRepository,
+          ) => new UseCaseProxy(new UpdateAccountUseCases(logger, userRepo)),
+        },
+        {
           inject: [DatabaseAccountRepository],
           provide: UsecasesProxyModule.IS_AUTHENTICATED_USECASES_PROXY,
           useFactory: (userRepo: DatabaseAccountRepository) =>
@@ -273,6 +293,8 @@ export class UsecasesProxyModule {
         UsecasesProxyModule.LOGIN_USECASES_PROXY,
         UsecasesProxyModule.IS_AUTHENTICATED_USECASES_PROXY,
         UsecasesProxyModule.LOGOUT_USECASES_PROXY,
+        UsecasesProxyModule.DELETE_ACCOUNT_USECASES_PROXY,
+        UsecasesProxyModule.UPDATE_ACCOUNT_USECASES_PROXY,
       ],
     };
   }

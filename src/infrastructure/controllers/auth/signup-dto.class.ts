@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, MinLength } from 'class-validator';
 
 export class SignUpDto {
   @ApiProperty({ required: true })
@@ -10,12 +10,14 @@ export class SignUpDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsString()
-  readonly password: string;
+  @IsEmail({}, { message: 'Invalid email format' })
+  readonly email: string;
 
   @ApiProperty({ required: true })
-  @IsString()
   @IsNotEmpty()
-  readonly email: string;
+  @IsString()
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  readonly password: string;
 
   @ApiProperty({ required: true })
   @IsString()
@@ -26,9 +28,4 @@ export class SignUpDto {
   @IsString()
   @IsNotEmpty()
   readonly lastName: string;
-
-  @ApiProperty({ required: true })
-  @IsString()
-  @IsNotEmpty()
-  readonly accountType: string;
 }

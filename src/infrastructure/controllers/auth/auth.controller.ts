@@ -7,6 +7,8 @@ import {
   Req,
   Request,
   UseGuards,
+  Delete,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -32,7 +34,9 @@ import { ApiResponseType } from '../../common/swagger/response.decorator';
 import { addAccountUseCases } from 'src/usecases/account/addAccount.usecases';
 import { SignUpDto } from './signup-dto.class';
 import { IsSignUpPresenter } from './signup.presenter';
-import { UserM } from 'src/domain/model/accountModel';
+import { DeleteUseCases } from 'src/usecases/account/deleteMyAccount.usecases';
+import { UpdateDto } from './update-dto.class';
+import { UpdateAccountUseCases } from 'src/usecases/account/update_account.usecases';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -52,6 +56,10 @@ export class AuthController {
     private readonly isAuthUsecaseProxy: UseCaseProxy<IsAuthenticatedUseCases>,
     @Inject(UsecasesProxyModule.POST_ACCOUNT_USECASES_PROXY)
     private readonly addAccountUseCasesProxy: UseCaseProxy<addAccountUseCases>,
+    @Inject(UsecasesProxyModule.DELETE_ACCOUNT_USECASES_PROXY)
+    private readonly deleteMyAccountUsecaseProxy: UseCaseProxy<DeleteUseCases>,
+    @Inject(UsecasesProxyModule.UPDATE_ACCOUNT_USECASES_PROXY)
+    private readonly updateMyAccountUsecaseProxy: UseCaseProxy<UpdateAccountUseCases>,
   ) {}
 
   @Post('login')
@@ -77,30 +85,24 @@ export class AuthController {
   @ApiBody({ type: SignUpDto })
   @ApiOperation({ description: 'signup' })
   async addaccount(@Body() signUpDto: SignUpDto) {
-    // const accessTokenCookie = await this.loginUsecaseProxy
-    //   .getInstance()
-    //   .getCookieWithJwtToken(signUpDto.username);
-    // const refreshTokenCookie = await this.loginUsecaseProxy
-    //   .getInstance()
-    //   .getCookieWithJwtRefreshToken(signUpDto.username);
-    const hashedPassword = await this.addAccountUseCasesProxy
-      .getInstance()
-      .getHashedPassword(signUpDto.password);
-    const signUpDtoWithHashedPassword: UserM = {
-      ...signUpDto,
-      createDate: new Date(),
-      updatedDate: new Date(),
-      lastLogin: new Date(),
-      accountType: 'user',
-      password: hashedPassword,
-    };
     const accountCreated = await this.addAccountUseCasesProxy
       .getInstance()
-      .execute(signUpDtoWithHashedPassword);
-    // request.res.setHeader('Set-Cookie', [
-    //   accessTokenCookie,
-    //   refreshTokenCookie,
-    // ]);
+      .execute(signUpDto);
+    return new IsSignUpPresenter(accountCreated);
+  }
+
+  @Post('signup_doctor')
+  @ApiBody({ type: SignUpDto })
+  @ApiBearerAuth()
+  @ApiOperation({ description: 'signupDoctor' })
+  @UseGuards(JwtAuthGuard)
+  async addaccountdoctor(
+    @Body() signUpDto: SignUpDto,
+    @Request() request: any,
+  ) {
+    const accountCreated = await this.addAccountUseCasesProxy
+      .getInstance()
+      .executeDoctor(signUpDto, request.user.accountType);
     return new IsSignUpPresenter(accountCreated);
   }
 
@@ -136,5 +138,29 @@ export class AuthController {
       .getCookieWithJwtToken(request.user.username);
     request.res.setHeader('Set-Cookie', accessTokenCookie);
     return 'Refresh successful';
+  }
+
+  @Delete('delete_my_account')
+  @UseGuards(JwtRefreshGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ description: 'delete' })
+  async deleteMyAccount(@Req() request: any) {
+    const usernameId = request.user.id;
+    await this.deleteMyAccountUsecaseProxy
+      .getInstance()
+      .deleteMyAccount(usernameId);
+    return 'Delete successful';
+  }
+
+  @Patch('update_my_account')
+  @UseGuards(JwtRefreshGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ description: 'update' })
+  async updateMyAccount(@Req() request: any, @Body() updateDto: UpdateDto) {
+    const user_id = request.user.id;
+    await this.updateMyAccountUsecaseProxy
+      .getInstance()
+      .updateAccountInfo(user_id, updateDto);
+    return 'Update successful';
   }
 }
