@@ -1,10 +1,24 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
-import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiExtraModels,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { DoctorPresenter } from './doctor.presenter';
-import { addDoctorUseCases } from 'src/usecases/doctor/addDoctor.usecases';
+import { addDoctorUseCases } from 'src/usecases/doctor/doctor.usecases';
 import { AddDoctorDto } from './doctor.dto';
+import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 
 @Controller('doctor')
 @ApiTags('doctor')
@@ -16,12 +30,15 @@ export class DoctorController {
     private readonly addDoctorUseCasesProxy: UseCaseProxy<addDoctorUseCases>,
   ) {}
 
-  @Post('doctor')
+  @Post('add')
+  @ApiBody({ type: AddDoctorDto })
   @ApiResponse({ type: DoctorPresenter })
-  async addDoctor(@Body() addDoctorDto: AddDoctorDto) {
+  @ApiOperation({ description: 'createdoctor' })
+  @UseGuards(JwtAuthGuard)
+  async addDoctor(@Body() addDoctorDto: AddDoctorDto, @Request() request: any) {
     const doctorCreated = await this.addDoctorUseCasesProxy
       .getInstance()
-      .execute(addDoctorDto);
+      .execute(addDoctorDto, request.user);
     return new DoctorPresenter(doctorCreated);
   }
 }

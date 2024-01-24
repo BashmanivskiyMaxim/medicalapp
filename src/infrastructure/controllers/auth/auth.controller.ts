@@ -85,6 +85,9 @@ export class AuthController {
   @ApiBody({ type: SignUpDto })
   @ApiOperation({ description: 'signup' })
   async addaccount(@Body() signUpDto: SignUpDto) {
+    await this.addAccountUseCasesProxy
+      .getInstance()
+      .checkUserUniqueness(signUpDto.username, signUpDto.email);
     const accountCreated = await this.addAccountUseCasesProxy
       .getInstance()
       .execute(signUpDto);
@@ -100,6 +103,9 @@ export class AuthController {
     @Body() signUpDto: SignUpDto,
     @Request() request: any,
   ) {
+    await this.addAccountUseCasesProxy
+      .getInstance()
+      .checkUserUniqueness(signUpDto.username, signUpDto.email);
     const accountCreated = await this.addAccountUseCasesProxy
       .getInstance()
       .executeDoctor(signUpDto, request.user.accountType);
@@ -141,7 +147,7 @@ export class AuthController {
   }
 
   @Delete('delete_my_account')
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ description: 'delete' })
   async deleteMyAccount(@Req() request: any) {
@@ -153,7 +159,7 @@ export class AuthController {
   }
 
   @Patch('update_my_account')
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ description: 'update' })
   async updateMyAccount(@Req() request: any, @Body() updateDto: UpdateDto) {

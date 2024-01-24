@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { PatientModel } from 'src/domain/model/patientModel';
+import { IsString } from 'class-validator';
 
 export class AddDoctorDto {
   @ApiProperty({ required: true })
-  @IsNotEmpty()
-  @IsNumber()
-  readonly id: number;
-  @IsNumber()
-  readonly accountId: number;
   @IsString()
   readonly specialty: string;
+  @ApiProperty({ required: true })
   @IsString()
   readonly qualification: string;
-  readonly patients: PatientModel[];
 }

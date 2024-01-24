@@ -70,6 +70,9 @@ export class DatabaseAccountRepository
   findAccountByEmail(email: string): Promise<any> {
     return this.AccountEntityRepository.findOne({ where: { email } });
   }
+  findAccountByUsername(username: string): Promise<any> {
+    return this.AccountEntityRepository.findOne({ where: { username } });
+  }
   findAccountById(id: number): Promise<any> {
     return this.AccountEntityRepository.findOne({ where: { id } });
   }

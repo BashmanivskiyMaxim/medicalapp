@@ -6,7 +6,7 @@ import { ExceptionsModule } from '../exceptions/exceptions.module';
 import { LoggerService } from '../logger/logger.service';
 import { DatabaseDoctorRepository } from '../repositories/doctor.repository';
 import { UseCaseProxy } from './usecases-proxy';
-import { addDoctorUseCases } from 'src/usecases/doctor/addDoctor.usecases';
+import { addDoctorUseCases } from 'src/usecases/doctor/doctor.usecases';
 import { DatabasePatientRepository } from '../repositories/patient.repository';
 import { addPatientUseCases } from 'src/usecases/patient/addPatient.usecases';
 import { DatabaseAddressRepository } from '../repositories/address.repository';

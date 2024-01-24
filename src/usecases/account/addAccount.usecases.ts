@@ -7,7 +7,7 @@ import { JWTConfig } from 'src/domain/config/jwt.interface';
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { UserM } from 'src/domain/model/accountModel';
 import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, ConflictException } from '@nestjs/common';
 
 export class addAccountUseCases {
   constructor(
@@ -50,6 +50,33 @@ export class addAccountUseCases {
       );
     }
   }
+
+  async checkUserUniqueness(username: string, email: string) {
+    const existingUsername =
+      await this.userRepository.findAccountByUsername(username);
+    const existingEmail = await this.userRepository.findAccountByEmail(email);
+
+    const errors = [];
+
+    if (existingUsername) {
+      errors.push({
+        field: 'username',
+        message: `Username '${username}' already exists`,
+      });
+    }
+
+    if (existingEmail) {
+      errors.push({
+        field: 'email',
+        message: `Email '${email}' already exists`,
+      });
+    }
+
+    if (errors.length > 0) {
+      throw new ConflictException(errors);
+    }
+  }
+
   async getCookieWithJwtToken(username: string) {
     this.logger.log(
       'LoginUseCases execute',

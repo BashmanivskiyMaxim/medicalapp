@@ -20,25 +20,40 @@ export class DatabaseContactInfoRepository
   }
   createContactInfo(contactInfo: ContactInfoModel): Promise<any> {
     const contactInfoEntity = this.contactInfoEntityRepository.create({
-      id: contactInfo.id,
       account: { id: contactInfo.accountId },
       contactNumber: contactInfo.contactNumber,
     });
     return this.contactInfoEntityRepository.save(contactInfoEntity);
   }
-  updateContactInfo(contactInfo: ContactInfoModel): Promise<any> {
-    return this.contactInfoEntityRepository.update(contactInfo.id, {
-      id: contactInfo.id,
-      account: { id: contactInfo.accountId },
+  findContactInfoByContactNumber(contactNumber: string): Promise<any> {
+    return this.contactInfoEntityRepository.findOne({
+      where: { contactNumber: contactNumber },
+    });
+  }
+  async updateContactInfo(
+    contactInfo: ContactInfoModel,
+    account_id: number,
+  ): Promise<any> {
+    const contactInfoGet = await this.findContactInfoByAccountId(account_id);
+    return this.contactInfoEntityRepository.save({
+      id: contactInfoGet.id,
       contactNumber: contactInfo.contactNumber,
     });
   }
-  deleteContactInfo(contactInfo: ContactInfoModel): Promise<any> {
-    return this.contactInfoEntityRepository.delete(contactInfo.id);
+  deleteContactInfo(id: number): Promise<any> {
+    return this.contactInfoEntityRepository.delete(id);
   }
   getContactInfo(contactInfo: ContactInfoModel): Promise<any> {
     return this.contactInfoEntityRepository.findOne({
       where: { id: contactInfo.id },
     });
+  }
+  findContactInfoByAccountId(accountId: number): Promise<any> {
+    return this.contactInfoEntityRepository.findOne({
+      where: { account: { id: accountId } },
+    });
+  }
+  getAllContactInfo(): Promise<any> {
+    return this.contactInfoEntityRepository.find();
   }
 }

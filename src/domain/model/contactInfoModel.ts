@@ -1,5 +1,5 @@
 export class ContactInfoModel {
-  id: number;
-  accountId: number;
+  id?: number;
+  accountId?: number;
   contactNumber: string;
 }
