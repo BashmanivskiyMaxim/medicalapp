@@ -36,6 +36,7 @@ import { JwtModule } from '../services/jwt/jwt.module';
 import { BcryptModule } from '../services/bcrypt/bcrypt.module';
 import { DeleteUseCases } from 'src/usecases/account/deleteMyAccount.usecases';
 import { UpdateAccountUseCases } from 'src/usecases/account/update_account.usecases';
+import { CheckExistenceUseCase } from 'src/usecases/utils/checkExistense.usecases';
 
 @Module({
   imports: [
@@ -76,9 +77,14 @@ export class UsecasesProxyModule {
           useFactory: (
             loggerService: LoggerService,
             databaseDoctorRepository: DatabaseDoctorRepository,
+            checkExistenceUseCase: CheckExistenceUseCase,
           ) =>
             new UseCaseProxy(
-              new addDoctorUseCases(loggerService, databaseDoctorRepository),
+              new addDoctorUseCases(
+                loggerService,
+                databaseDoctorRepository,
+                checkExistenceUseCase,
+              ),
             ),
         },
         {
@@ -112,9 +118,14 @@ export class UsecasesProxyModule {
           useFactory: (
             loggerService: LoggerService,
             databaseAddressRepository: DatabaseAddressRepository,
+            checkExistenceUseCase: CheckExistenceUseCase,
           ) =>
             new UseCaseProxy(
-              new addAddressUseCases(loggerService, databaseAddressRepository),
+              new addAddressUseCases(
+                loggerService,
+                databaseAddressRepository,
+                checkExistenceUseCase,
+              ),
             ),
         },
         {

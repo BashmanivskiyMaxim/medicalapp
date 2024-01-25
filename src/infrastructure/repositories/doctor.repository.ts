@@ -35,18 +35,16 @@ export class DatabaseDoctorRepository
       qualification: doctor.qualification,
     });
   }
-  deleteDoctor(doctor: DoctorModel): Promise<any> {
-    return this.doctorEntityRepository.delete(doctor.id);
+  deleteDoctor(doctorAccountId: number): Promise<any> {
+    return this.doctorEntityRepository.delete(doctorAccountId);
   }
-  getDoctor(doctor: DoctorModel): Promise<any> {
-    return this.doctorEntityRepository.findOne({
+  async getDoctor(doctor: DoctorModel): Promise<any> {
+    return await this.doctorEntityRepository.findOne({
       where: { id: doctor.id },
     });
   }
-  getDoctors(doctor: DoctorModel[]): Promise<any> {
-    return this.doctorEntityRepository.find({
-      where: doctor.map((doctor) => ({ id: doctor.id })),
-    });
+  getDoctors(): Promise<any> {
+    return this.doctorEntityRepository.find();
   }
   findDoctorByAccountId(accountId: number): Promise<any> {
     return this.doctorEntityRepository.findOne({

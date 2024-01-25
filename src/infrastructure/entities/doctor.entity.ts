@@ -2,7 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
+  ManyToOne,
   JoinColumn,
 } from 'typeorm';
 import { AccountEntity } from './account.entity';
@@ -18,7 +18,7 @@ export class DoctorEntity {
   @Column()
   qualification: string;
 
-  @OneToOne(() => AccountEntity)
+  @ManyToOne(() => AccountEntity, (account) => account.doctors)
   @JoinColumn({ name: 'account_id' })
   account: AccountEntity;
 }

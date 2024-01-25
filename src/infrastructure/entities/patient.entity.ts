@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { AccountEntity } from './account.entity';
 import { DoctorEntity } from './doctor.entity';
 
@@ -13,7 +7,7 @@ export class PatientEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => AccountEntity)
+  @ManyToOne(() => AccountEntity, (account) => account.patients)
   @JoinColumn({ name: 'account_id' })
   account: AccountEntity;
 

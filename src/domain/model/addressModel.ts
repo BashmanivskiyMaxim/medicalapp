@@ -1,5 +1,5 @@
 export class AddressModel {
-  id: number;
+  id?: number;
   address: string;
-  accountId: number;
+  accountId?: number;
 }

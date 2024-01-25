@@ -56,11 +56,13 @@ export class AccountEntity {
   @OneToOne(() => AddressEntity, { cascade: true })
   address: AddressEntity;
 
-  @OneToOne(() => DoctorEntity, { cascade: true })
-  doctor: DoctorEntity;
+  @OneToMany(() => DoctorEntity, (doctor) => doctor.account, { cascade: true })
+  doctors: DoctorEntity[];
 
-  @OneToOne(() => PatientEntity, { cascade: true })
-  patient: PatientEntity;
+  @OneToMany(() => PatientEntity, (patient) => patient.account, {
+    cascade: true,
+  })
+  patients: PatientEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.sender)
   sentMessages: MessageEntity[];

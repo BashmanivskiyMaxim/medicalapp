@@ -1,14 +1,32 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
-import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiExtraModels,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { AddressPresenter } from './address.presenter';
 import { addAddressUseCases } from 'src/usecases/address/addAddress.usecases';
 import { AddAddressDto } from './address.dto';
+import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 
 @Controller('address')
 @ApiTags('address')
 @ApiResponse({ status: 500, description: 'Internal Error' })
+@ApiResponse({
+  status: 401,
+  description: 'No authorization token was found',
+})
 @ApiExtraModels(AddressPresenter)
 export class AddressController {
   constructor(
@@ -16,12 +34,18 @@ export class AddressController {
     private readonly addAddressUseCasesProxy: UseCaseProxy<addAddressUseCases>,
   ) {}
 
-  @Post('address')
+  @Post('add')
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({ type: AddAddressDto })
+  @ApiOperation({ description: 'add address info' })
   @ApiResponse({ type: AddressPresenter })
-  async addappointment(@Body() addaddressDto: AddAddressDto) {
+  async addAddress(
+    @Body() addaddressDto: AddAddressDto,
+    @Request() request: any,
+  ) {
     const addressCreated = await this.addAddressUseCasesProxy
       .getInstance()
-      .execute(addaddressDto);
+      .execute(addaddressDto, request.user.id);
     return new AddressPresenter(addressCreated);
   }
 }

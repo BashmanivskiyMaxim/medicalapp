@@ -10,10 +10,10 @@ export class addContactInfoUseCases {
   ) {}
   async execute(
     data: ContactInfoModel,
-    account_Id: string,
+    account_id: string,
   ): Promise<ContactInfoModel> {
     const contactInfo = new ContactInfoModel();
-    contactInfo.accountId = +account_Id;
+    contactInfo.accountId = +account_id;
     contactInfo.contactNumber = data.contactNumber;
     const result =
       await this.contactInfoRepository.createContactInfo(contactInfo);
@@ -39,7 +39,6 @@ export class addContactInfoUseCases {
   ) {
     const existingContactNumberAccount =
       await this.contactInfoRepository.findContactInfoByAccountId(+account_id);
-
     if (existingContactNumberAccount && throwErrorIfExists) {
       throw new ConflictException(
         'Contact info for this account already exists',

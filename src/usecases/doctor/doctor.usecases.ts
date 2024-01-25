@@ -6,65 +6,95 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { CheckExistenceUseCase } from '../utils/checkExistense.usecases';
 
 export class addDoctorUseCases {
   constructor(
     private readonly logger: ILogger,
     private readonly doctorRepository: DoctorRepository,
+    private readonly checkExistenceUseCase: CheckExistenceUseCase,
   ) {}
-  async execute(data: DoctorModel, accountDoctor): Promise<DoctorModel> {
-    if (accountDoctor.accountType === 'doctor') {
-      const doctor = new DoctorModel();
-      doctor.accountId = accountDoctor.id;
-      doctor.specialty = data.specialty;
-      doctor.qualification = data.qualification;
-      const result = await this.doctorRepository.createDoctor(doctor);
-      this.logger.log(
-        'addDoctorUseCases execute',
-        'New apointment have been inserted',
-      );
-      return result;
-    } else {
+
+  private ensureIsDoctor(accountType: string) {
+    if (accountType !== 'doctor' && accountType !== 'admin') {
       throw new ForbiddenException(
         'Permission denied. Only doctors can execute this operation.',
       );
     }
   }
 
-  async checkExistence(
-    account_id: string,
-    throwErrorIfExists: boolean = false,
-  ) {
-    const existingContactNumberAccount =
-      await this.doctorRepository.findDoctorByAccountId(+account_id);
+  async execute(data: DoctorModel, accountDoctor): Promise<DoctorModel> {
+    this.ensureIsDoctor(accountDoctor.accountType);
+    const doctor = new DoctorModel();
+    doctor.accountId = accountDoctor.id;
+    doctor.specialty = data.specialty;
+    doctor.qualification = data.qualification;
+    const result = await this.doctorRepository.createDoctor(doctor);
+    this.logger.log(
+      'addDoctorUseCases execute',
+      'New apointment have been inserted',
+    );
+    return result;
+  }
 
-    if (existingContactNumberAccount && throwErrorIfExists) {
+  async checkExistence(account_id: any, throwErrorIfExists: boolean = false) {
+    const existingDoctorAccount =
+      await this.doctorRepository.findDoctorByAccountId(+account_id);
+    console.log(existingDoctorAccount);
+    if (existingDoctorAccount && throwErrorIfExists) {
       throw new ConflictException(
-        'Contact info for this account already exists',
+        'Doctor info for this account already exists',
       );
     }
 
-    if (!existingContactNumberAccount && !throwErrorIfExists) {
+    if (!existingDoctorAccount && !throwErrorIfExists) {
       throw new NotFoundException(
-        'Contact info for this account does not exist',
+        'Doctor info for this account does not exist',
       );
     }
   }
   async updateDoctorInfo(
     data: DoctorModel,
-    account_id: string,
+    accountDoctor: any,
   ): Promise<DoctorModel> {
+    this.ensureIsDoctor(accountDoctor.accountType);
+    this.checkExistenceUseCase.execute(accountDoctor.id);
     const doctor = new DoctorModel();
     doctor.specialty = data.specialty;
     doctor.qualification = data.qualification;
     const result = await this.doctorRepository.updateDoctor(
       doctor,
-      +account_id,
+      +accountDoctor.id,
     );
     this.logger.log(
       'updateDoctorInfoUseCases execute',
       'Doctor info have been updated',
     );
     return result;
+  }
+
+  async deleteDoctor(accountDoctor: any): Promise<DoctorModel> {
+    this.ensureIsDoctor(accountDoctor.accountType);
+    await this.checkExistenceUseCase.execute(accountDoctor.id);
+    const existingDoctorAccount =
+      await this.doctorRepository.findDoctorByAccountId(+accountDoctor.id);
+    const result = await this.doctorRepository.deleteDoctor(
+      +existingDoctorAccount.id,
+    );
+    this.logger.log(
+      'deleteDoctorUseCases execute',
+      'Doctor info have been deleted',
+    );
+    return result;
+  }
+
+  async getDoctors(accountType: string): Promise<DoctorModel> {
+    this.ensureIsDoctor(accountType);
+    const Doctors = await this.doctorRepository.getDoctors();
+    this.logger.log(
+      'getDoctorsUseCases execute',
+      'Doctors have been retrieved',
+    );
+    return Doctors;
   }
 }

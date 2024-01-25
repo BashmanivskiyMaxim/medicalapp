@@ -86,7 +86,6 @@ export class ContactInfoController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'get' })
   async getContactInfo(@Req() request: any) {
-    console.log(request.user);
     const contactInfo = await this.addContactInfoUseCasesProxy
       .getInstance()
       .getAllContactInfo(request.user.accountType);
