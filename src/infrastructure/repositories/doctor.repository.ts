@@ -21,16 +21,16 @@ export class DatabaseDoctorRepository
   createDoctor(doctor: DoctorModel): Promise<any> {
     const doctorEntity = this.doctorEntityRepository.create({
       id: doctor.id,
-      account: { id: doctor.accountId }, // Assign the account property as an object with the id property
+      account: { id: doctor.accountId },
       specialty: doctor.specialty,
       qualification: doctor.qualification,
     });
     return this.doctorEntityRepository.save(doctorEntity);
   }
-  updateDoctor(doctor: DoctorModel): Promise<any> {
-    return this.doctorEntityRepository.update(doctor.id, {
-      id: doctor.id,
-      account: { id: doctor.accountId }, // Assign the account property as an object with the id property
+  async updateDoctor(doctor: DoctorModel, account_id: number): Promise<any> {
+    const doctorGet = await this.findDoctorByAccountId(account_id);
+    return this.doctorEntityRepository.save({
+      id: doctorGet.id,
       specialty: doctor.specialty,
       qualification: doctor.qualification,
     });
@@ -46,6 +46,11 @@ export class DatabaseDoctorRepository
   getDoctors(doctor: DoctorModel[]): Promise<any> {
     return this.doctorEntityRepository.find({
       where: doctor.map((doctor) => ({ id: doctor.id })),
+    });
+  }
+  findDoctorByAccountId(accountId: number): Promise<any> {
+    return this.doctorEntityRepository.findOne({
+      where: { account: { id: accountId } },
     });
   }
 }
