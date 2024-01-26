@@ -1,18 +1,14 @@
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
 import { DoctorModel } from 'src/domain/model/doctorModel';
-import {
-  ConflictException,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
-import { CheckExistenceUseCase } from '../utils/checkExistense.usecases';
+import { ForbiddenException } from '@nestjs/common';
+import { EntityValidator } from '../utils/checkExistense.usecases';
 
 export class addDoctorUseCases {
   constructor(
     private readonly logger: ILogger,
     private readonly doctorRepository: DoctorRepository,
-    private readonly checkExistenceUseCase: CheckExistenceUseCase,
+    private readonly EntityValidator: EntityValidator,
   ) {}
 
   private ensureIsDoctor(accountType: string) {
@@ -37,35 +33,17 @@ export class addDoctorUseCases {
     return result;
   }
 
-  async checkExistence(account_id: any, throwErrorIfExists: boolean = false) {
-    const existingDoctorAccount =
-      await this.doctorRepository.findDoctorByAccountId(+account_id);
-    console.log(existingDoctorAccount);
-    if (existingDoctorAccount && throwErrorIfExists) {
-      throw new ConflictException(
-        'Doctor info for this account already exists',
-      );
-    }
-
-    if (!existingDoctorAccount && !throwErrorIfExists) {
-      throw new NotFoundException(
-        'Doctor info for this account does not exist',
-      );
-    }
-  }
   async updateDoctorInfo(
+    id: string,
     data: DoctorModel,
     accountDoctor: any,
   ): Promise<DoctorModel> {
     this.ensureIsDoctor(accountDoctor.accountType);
-    this.checkExistenceUseCase.execute(accountDoctor.id);
+    await this.EntityValidator.existence(accountDoctor.id);
     const doctor = new DoctorModel();
     doctor.specialty = data.specialty;
     doctor.qualification = data.qualification;
-    const result = await this.doctorRepository.updateDoctor(
-      doctor,
-      +accountDoctor.id,
-    );
+    const result = await this.doctorRepository.updateDoctor(+id, doctor);
     this.logger.log(
       'updateDoctorInfoUseCases execute',
       'Doctor info have been updated',
@@ -75,9 +53,10 @@ export class addDoctorUseCases {
 
   async deleteDoctor(accountDoctor: any): Promise<DoctorModel> {
     this.ensureIsDoctor(accountDoctor.accountType);
-    await this.checkExistenceUseCase.execute(accountDoctor.id);
-    const existingDoctorAccount =
-      await this.doctorRepository.findDoctorByAccountId(+accountDoctor.id);
+    await this.EntityValidator.existence(accountDoctor.id);
+    const existingDoctorAccount = await this.doctorRepository.findByAccountId(
+      +accountDoctor.id,
+    );
     const result = await this.doctorRepository.deleteDoctor(
       +existingDoctorAccount.id,
     );

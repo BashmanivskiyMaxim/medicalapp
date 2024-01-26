@@ -11,7 +11,7 @@ export class PatientEntity {
   @JoinColumn({ name: 'account_id' })
   account: AccountEntity;
 
-  @ManyToOne(() => DoctorEntity)
+  @ManyToOne(() => DoctorEntity, (doctor) => doctor.account)
   @JoinColumn({ name: 'doctor_id' })
   doctor: DoctorEntity;
 }

@@ -20,19 +20,16 @@ export class DatabaseDoctorRepository
   }
   createDoctor(doctor: DoctorModel): Promise<any> {
     const doctorEntity = this.doctorEntityRepository.create({
-      id: doctor.id,
       account: { id: doctor.accountId },
       specialty: doctor.specialty,
       qualification: doctor.qualification,
     });
     return this.doctorEntityRepository.save(doctorEntity);
   }
-  async updateDoctor(doctor: DoctorModel, account_id: number): Promise<any> {
-    const doctorGet = await this.findDoctorByAccountId(account_id);
+  async updateDoctor(id: number, doctor: DoctorModel): Promise<any> {
     return this.doctorEntityRepository.save({
-      id: doctorGet.id,
-      specialty: doctor.specialty,
-      qualification: doctor.qualification,
+      id: id,
+      ...doctor,
     });
   }
   deleteDoctor(doctorAccountId: number): Promise<any> {
@@ -46,7 +43,7 @@ export class DatabaseDoctorRepository
   getDoctors(): Promise<any> {
     return this.doctorEntityRepository.find();
   }
-  findDoctorByAccountId(accountId: number): Promise<any> {
+  findByAccountId(accountId: number): Promise<any> {
     return this.doctorEntityRepository.findOne({
       where: { account: { id: accountId } },
     });

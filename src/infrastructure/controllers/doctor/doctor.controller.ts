@@ -9,6 +9,7 @@ import {
   Req,
   Delete,
   Get,
+  Param,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -50,16 +51,17 @@ export class DoctorController {
     return new DoctorPresenter(doctorCreated);
   }
 
-  @Patch('update')
+  @Patch('update/:id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'update' })
-  async updateDoctor(@Req() request: any, @Body() updateDto: AddDoctorDto) {
+  async updateDoctor(
+    @Req() request: any,
+    @Body() updateDto: AddDoctorDto,
+    @Param('id') id: string,
+  ) {
     await this.addDoctorUseCasesProxy
       .getInstance()
-      .checkExistence(request.user.id);
-    await this.addDoctorUseCasesProxy
-      .getInstance()
-      .updateDoctorInfo(updateDto, request.user);
+      .updateDoctorInfo(id, updateDto, request.user);
     return 'Update successful';
   }
 

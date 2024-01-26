@@ -36,7 +36,7 @@ import { JwtModule } from '../services/jwt/jwt.module';
 import { BcryptModule } from '../services/bcrypt/bcrypt.module';
 import { DeleteUseCases } from 'src/usecases/account/deleteMyAccount.usecases';
 import { UpdateAccountUseCases } from 'src/usecases/account/update_account.usecases';
-import { CheckExistenceUseCase } from 'src/usecases/utils/checkExistense.usecases';
+import { EntityValidator } from 'src/usecases/utils/checkExistense.usecases';
 
 @Module({
   imports: [
@@ -77,13 +77,12 @@ export class UsecasesProxyModule {
           useFactory: (
             loggerService: LoggerService,
             databaseDoctorRepository: DatabaseDoctorRepository,
-            checkExistenceUseCase: CheckExistenceUseCase,
           ) =>
             new UseCaseProxy(
               new addDoctorUseCases(
                 loggerService,
                 databaseDoctorRepository,
-                checkExistenceUseCase,
+                new EntityValidator(databaseDoctorRepository),
               ),
             ),
         },
@@ -102,14 +101,23 @@ export class UsecasesProxyModule {
             ),
         },
         {
-          inject: [LoggerService, DatabasePatientRepository],
+          inject: [
+            LoggerService,
+            DatabasePatientRepository,
+            DatabaseDoctorRepository,
+          ],
           provide: UsecasesProxyModule.POST_PATIENT_USECASES_PROXY,
           useFactory: (
             loggerService: LoggerService,
             databasePatientRepository: DatabasePatientRepository,
+            databaseDoctorRepository: DatabaseDoctorRepository,
           ) =>
             new UseCaseProxy(
-              new addPatientUseCases(loggerService, databasePatientRepository),
+              new addPatientUseCases(
+                loggerService,
+                databasePatientRepository,
+                databaseDoctorRepository,
+              ),
             ),
         },
         {
@@ -118,13 +126,12 @@ export class UsecasesProxyModule {
           useFactory: (
             loggerService: LoggerService,
             databaseAddressRepository: DatabaseAddressRepository,
-            checkExistenceUseCase: CheckExistenceUseCase,
           ) =>
             new UseCaseProxy(
               new addAddressUseCases(
                 loggerService,
                 databaseAddressRepository,
-                checkExistenceUseCase,
+                new EntityValidator(databaseAddressRepository),
               ),
             ),
         },
@@ -179,6 +186,7 @@ export class UsecasesProxyModule {
               new addContactInfoUseCases(
                 loggerService,
                 databaseContactInfoRepository,
+                new EntityValidator(databaseContactInfoRepository),
               ),
             ),
         },

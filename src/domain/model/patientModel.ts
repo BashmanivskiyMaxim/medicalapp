@@ -1,5 +1,5 @@
 export class PatientModel {
-  id: number;
-  accountId: number;
-  doctorId: number;
+  id?: number;
+  accountId?: number;
+  doctorId?: number;
 }

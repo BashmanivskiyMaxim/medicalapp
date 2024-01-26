@@ -5,9 +5,9 @@ export class AddPatientDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsNumber()
-  readonly id: number;
-  @IsNumber()
   readonly accountId: number;
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
   @IsNumber()
   readonly doctorId: number;
 }

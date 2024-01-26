@@ -1,17 +1,24 @@
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { ContactInfoRepository } from 'src/domain/repositories/contactInfo.repository.interface';
 import { ContactInfoModel } from 'src/domain/model/contactInfoModel';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
+import { EntityValidator } from '../utils/checkExistense.usecases';
 
 export class addContactInfoUseCases {
   constructor(
     private readonly logger: ILogger,
     private readonly contactInfoRepository: ContactInfoRepository,
+    private readonly checkExistenceUseCase: EntityValidator,
   ) {}
   async execute(
     data: ContactInfoModel,
     account_id: string,
   ): Promise<ContactInfoModel> {
+    await this.checkExistenceUseCase.existence(account_id, true);
+    await this.checkExistenceUseCase.uniqueness(
+      'contactInfo',
+      data.contactNumber,
+    );
     const contactInfo = new ContactInfoModel();
     contactInfo.accountId = +account_id;
     contactInfo.contactNumber = data.contactNumber;
@@ -23,40 +30,15 @@ export class addContactInfoUseCases {
     );
     return result;
   }
-  async checkUniqueness(contactNumber: string) {
-    const existingContactNumber =
-      await this.contactInfoRepository.findContactInfoByContactNumber(
-        contactNumber,
-      );
-
-    if (existingContactNumber) {
-      throw new ConflictException('Contact number already exists');
-    }
-  }
-  async checkExistence(
-    account_id: string,
-    throwErrorIfExists: boolean = false,
-  ) {
-    const existingContactNumberAccount =
-      await this.contactInfoRepository.findContactInfoByAccountId(+account_id);
-    if (existingContactNumberAccount && throwErrorIfExists) {
-      throw new ConflictException(
-        'Contact info for this account already exists',
-      );
-    }
-
-    if (!existingContactNumberAccount && !throwErrorIfExists) {
-      throw new NotFoundException(
-        'Contact info for this account does not exist',
-      );
-    }
-  }
   async updateContactInfo(
     data: ContactInfoModel,
     account_id: string,
   ): Promise<ContactInfoModel> {
-    await this.checkExistence(account_id, false);
-    await this.checkUniqueness(data.contactNumber);
+    await this.checkExistenceUseCase.existence(account_id, false);
+    await this.checkExistenceUseCase.uniqueness(
+      'contactInfo',
+      data.contactNumber,
+    );
     const contactInfo = new ContactInfoModel();
     contactInfo.contactNumber = data.contactNumber;
     const result = await this.contactInfoRepository.updateContactInfo(
@@ -70,9 +52,9 @@ export class addContactInfoUseCases {
     return result;
   }
   async deleteContactInfo(account_id: string): Promise<ContactInfoModel> {
-    await this.checkExistence(account_id, false);
+    await this.checkExistenceUseCase.existence(account_id, false);
     const existingContactNumberAccount =
-      await this.contactInfoRepository.findContactInfoByAccountId(+account_id);
+      await this.contactInfoRepository.findByAccountId(+account_id);
     const result = await this.contactInfoRepository.deleteContactInfo(
       +existingContactNumberAccount.id,
     );
@@ -92,8 +74,6 @@ export class addContactInfoUseCases {
         'ContactInfo have been get',
       );
       return ContactNumberAccounts;
-    } else {
-      throw new ConflictException('Permission denied');
-    }
+    } else throw new ConflictException('Permission denied');
   }
 }

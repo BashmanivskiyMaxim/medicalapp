@@ -8,7 +8,7 @@ export interface ContactInfoRepository {
   ): Promise<any>;
   deleteContactInfo(id: number): Promise<any>;
   getContactInfo(contactInfo: any): Promise<any>;
-  findContactInfoByContactNumber(contactNumber: string): Promise<any>;
-  findContactInfoByAccountId(accountId: number): Promise<any>;
+  findByProperty(contactNumber: string): Promise<any>;
+  findByAccountId(accountId: number): Promise<any>;
   getAllContactInfo(): Promise<any>;
 }

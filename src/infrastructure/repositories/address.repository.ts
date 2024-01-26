@@ -1,5 +1,3 @@
-//rewrite this repository like the account repository
-
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -28,25 +26,41 @@ export class DatabaseAddressRepository
       },
     });
   }
-  createAddress(address: any): Promise<any> {
-    const addressEntity = this.addressEntity.create(address);
-    return this.addressEntity.save(addressEntity);
+  async createAddress(address: AddressModel): Promise<any> {
+    const addressEntity = this.addressEntity.create({
+      account: { id: address.accountId },
+      address: address.address,
+    });
+    return await this.addressEntity.save(addressEntity);
   }
-  updateAddress(address: any): Promise<any> {
-    return this.addressEntity.update(address.id, address);
+  async updateAddress(address: any, account_id: number): Promise<any> {
+    const addressGet = await this.findByAccountId(account_id);
+    return await this.addressEntity.save({
+      id: addressGet.id,
+      address: address.address,
+    });
   }
-  deleteAddress(address: any): Promise<any> {
-    return this.addressEntity.delete(address.id);
+  deleteAddress(id: number): Promise<any> {
+    return this.addressEntity.delete(id);
   }
-  getAddress(address: AddressModel): Promise<any> {
+  findByProperty(address: AddressModel): Promise<any> {
     return this.addressEntity.findOne({
       where: {
         address: address.address,
       },
     });
   }
+  async findByAccountId(account_id: number): Promise<any> {
+    return await this.addressEntity.findOne({
+      where: { account: { id: account_id } },
+    });
+  }
 
-  public async findAddress(): Promise<AddressEntity | undefined> {
+  async findAddress(): Promise<AddressEntity | undefined> {
     return await this.addressEntity.findOne({});
+  }
+
+  async getAllAddresses(): Promise<any> {
+    return await this.addressEntity.find();
   }
 }

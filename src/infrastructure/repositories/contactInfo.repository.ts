@@ -25,7 +25,7 @@ export class DatabaseContactInfoRepository
     });
     return this.contactInfoEntityRepository.save(contactInfoEntity);
   }
-  findContactInfoByContactNumber(contactNumber: string): Promise<any> {
+  findByProperty(contactNumber: string): Promise<any> {
     return this.contactInfoEntityRepository.findOne({
       where: { contactNumber: contactNumber },
     });
@@ -34,7 +34,7 @@ export class DatabaseContactInfoRepository
     contactInfo: ContactInfoModel,
     account_id: number,
   ): Promise<any> {
-    const contactInfoGet = await this.findContactInfoByAccountId(account_id);
+    const contactInfoGet = await this.findByAccountId(account_id);
     return this.contactInfoEntityRepository.save({
       id: contactInfoGet.id,
       contactNumber: contactInfo.contactNumber,
@@ -48,12 +48,12 @@ export class DatabaseContactInfoRepository
       where: { id: contactInfo.id },
     });
   }
-  findContactInfoByAccountId(accountId: number): Promise<any> {
-    return this.contactInfoEntityRepository.findOne({
+  async findByAccountId(accountId: number): Promise<any> {
+    return await this.contactInfoEntityRepository.findOne({
       where: { account: { id: accountId } },
     });
   }
-  getAllContactInfo(): Promise<any> {
-    return this.contactInfoEntityRepository.find();
+  async getAllContactInfo(): Promise<any> {
+    return await this.contactInfoEntityRepository.find();
   }
 }

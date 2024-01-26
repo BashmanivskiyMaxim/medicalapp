@@ -5,6 +5,10 @@ import {
   Post,
   UseGuards,
   Request,
+  Patch,
+  Req,
+  Delete,
+  Get,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -47,5 +51,35 @@ export class AddressController {
       .getInstance()
       .execute(addaddressDto, request.user.id);
     return new AddressPresenter(addressCreated);
+  }
+
+  @Patch('update')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'update' })
+  async updateAddress(@Req() request: any, @Body() updateDto: AddAddressDto) {
+    await this.addAddressUseCasesProxy
+      .getInstance()
+      .updateAddress(updateDto, request.user.id);
+    return 'Update successful';
+  }
+
+  @Delete('delete')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'delete' })
+  async deleteAddress(@Req() request: any) {
+    await this.addAddressUseCasesProxy
+      .getInstance()
+      .deleteAddress(request.user.id);
+    return 'Delete successful';
+  }
+
+  @Get('get')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getAddress(@Req() request: any) {
+    const address = await this.addAddressUseCasesProxy
+      .getInstance()
+      .getAllAddresses(request.user.accountType);
+    return address;
   }
 }

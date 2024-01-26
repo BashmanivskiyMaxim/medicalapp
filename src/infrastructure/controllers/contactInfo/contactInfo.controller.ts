@@ -47,12 +47,6 @@ export class ContactInfoController {
     @Body() addcontactInfoDto: AddContactInfoDto,
     @Request() request: any,
   ) {
-    await this.addContactInfoUseCasesProxy
-      .getInstance()
-      .checkExistence(request.user.id, true);
-    await this.addContactInfoUseCasesProxy
-      .getInstance()
-      .checkUniqueness(addcontactInfoDto.contactNumber);
     const contactInfoCreated = await this.addContactInfoUseCasesProxy
       .getInstance()
       .execute(addcontactInfoDto, request.user.id);

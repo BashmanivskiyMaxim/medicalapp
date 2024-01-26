@@ -20,7 +20,6 @@ export class DatabasePatientRepository
   }
   createPatient(patient: PatientModel): Promise<any> {
     const patientEntity = this.patientEntityRepository.create({
-      id: patient.id,
       account: { id: patient.accountId },
       doctor: { id: patient.doctorId },
     });
@@ -28,7 +27,6 @@ export class DatabasePatientRepository
   }
   updatePatient(patient: PatientModel): Promise<any> {
     return this.patientEntityRepository.update(patient.id, {
-      id: patient.id,
       account: { id: patient.accountId },
       doctor: { id: patient.doctorId },
     });
