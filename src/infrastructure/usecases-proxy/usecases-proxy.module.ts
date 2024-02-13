@@ -117,6 +117,7 @@ export class UsecasesProxyModule {
                 loggerService,
                 databasePatientRepository,
                 databaseDoctorRepository,
+                new EntityValidator(databasePatientRepository),
               ),
             ),
         },

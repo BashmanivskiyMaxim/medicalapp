@@ -31,17 +31,18 @@ export class DatabasePatientRepository
       doctor: { id: patient.doctorId },
     });
   }
-  deletePatient(patient: PatientModel): Promise<any> {
-    return this.patientEntityRepository.delete(patient.id);
+  deletePatient(patientId: number): Promise<any> {
+    return this.patientEntityRepository.delete(patientId);
   }
-  getPatient(patient: PatientModel): Promise<any> {
+  getPatient(patientId: number, doctorId: number): Promise<any> {
     return this.patientEntityRepository.findOne({
-      where: { id: patient.id },
+      where: { id: patientId, doctor: { id: doctorId } },
+      // add complete patient info to db
     });
   }
-  getPatients(patient: PatientModel[]): Promise<any> {
+  getPatients(doctorId: number): Promise<any> {
     return this.patientEntityRepository.find({
-      where: patient.map((patient) => ({ id: patient.id })),
+      where: { doctor: { id: doctorId } },
     });
   }
 }

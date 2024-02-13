@@ -1,4 +1,12 @@
-import { Controller, Inject, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiExtraModels,
   ApiOperation,
@@ -25,10 +33,30 @@ export class PatientController {
   @ApiResponse({ type: PatientPresenter })
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'createPatient' })
-  async addPatient(@Request() request: any) {
+  async addPatient(@Req() request: any) {
     const patientCreated = await this.addPatientUseCasesProxy
       .getInstance()
       .execute(request.user, +request.params.accountId);
     return new PatientPresenter(patientCreated);
+  }
+
+  @Delete('delete/:patientId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'deletePatient' })
+  async deleteDoctor(@Req() request: any) {
+    await this.addPatientUseCasesProxy
+      .getInstance()
+      .deletePatient(request.user, request.params.patientId);
+    return 'Delete successful';
+  }
+
+  @Get('get')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'getPatients' })
+  async getPatients(@Req() request: any) {
+    const patients = await this.addPatientUseCasesProxy
+      .getInstance()
+      .getPatients(request.user);
+    return patients;
   }
 }

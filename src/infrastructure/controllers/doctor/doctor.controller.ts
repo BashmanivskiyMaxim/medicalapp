@@ -76,10 +76,10 @@ export class DoctorController {
   @Get('get')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'get' })
-  async getContactInfo(@Req() request: any) {
-    const contactInfo = await this.addDoctorUseCasesProxy
+  async getDoctors(@Req() request: any) {
+    const doctors = await this.addDoctorUseCasesProxy
       .getInstance()
       .getDoctors(request.user.accountType);
-    return contactInfo;
+    return doctors;
   }
 }
