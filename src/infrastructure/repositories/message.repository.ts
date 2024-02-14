@@ -45,4 +45,9 @@ export class DatabaseMessageRepository
   getMessage(message: MessageModel): Promise<any> {
     return this.messageEntityRepository.findOne({ where: { id: message.id } });
   }
+  getMessages(receiverId: number): Promise<any> {
+    return this.messageEntityRepository.find({
+      where: { receiver: { id: receiverId } },
+    });
+  }
 }

@@ -1,8 +1,8 @@
 export class MessageModel {
-  id: number;
-  senderId: number;
+  id?: number;
+  senderId?: number;
   receiverId: number;
-  role: string;
+  role?: string;
   messageContent: string;
-  timestamp: Date;
+  timestamp?: Date;
 }

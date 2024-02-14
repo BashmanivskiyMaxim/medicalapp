@@ -37,6 +37,8 @@ import { BcryptModule } from '../services/bcrypt/bcrypt.module';
 import { DeleteUseCases } from 'src/usecases/account/deleteMyAccount.usecases';
 import { UpdateAccountUseCases } from 'src/usecases/account/update_account.usecases';
 import { EntityValidator } from 'src/usecases/utils/checkExistense.usecases';
+import { EncryptModule } from '../services/encrypt/encrypt.module';
+import { EncryptService } from '../services/encrypt/encrypt.service';
 
 @Module({
   imports: [
@@ -46,6 +48,7 @@ import { EntityValidator } from 'src/usecases/utils/checkExistense.usecases';
     EnvironmentConfigModule,
     RepositoriesModule,
     ExceptionsModule,
+    EncryptModule,
   ],
 })
 export class UsecasesProxyModule {
@@ -234,14 +237,19 @@ export class UsecasesProxyModule {
             ),
         },
         {
-          inject: [LoggerService, DatabaseMessageRepository],
+          inject: [LoggerService, DatabaseMessageRepository, EncryptService],
           provide: UsecasesProxyModule.POST_MESSAGE_USECASES_PROXY,
           useFactory: (
             loggerService: LoggerService,
             databaseMessageRepository: DatabaseMessageRepository,
+            encryptService: EncryptService,
           ) =>
             new UseCaseProxy(
-              new addMessageUseCases(loggerService, databaseMessageRepository),
+              new addMessageUseCases(
+                loggerService,
+                databaseMessageRepository,
+                encryptService,
+              ),
             ),
         },
         {

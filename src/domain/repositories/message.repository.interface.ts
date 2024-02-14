@@ -5,4 +5,5 @@ export interface MessageRepository {
   updateMessage(message: MessageModel): Promise<any>;
   deleteMessage(message: MessageModel): Promise<any>;
   getMessage(message: MessageModel): Promise<any>;
+  getMessages(receiverId: number): Promise<any>;
 }
