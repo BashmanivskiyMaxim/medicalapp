@@ -23,8 +23,8 @@ export class MessageEntity {
   @Column()
   role: string;
 
-  @Column({ name: 'messageContent' })
-  messageContent: string;
+  @Column({ name: 'messageContent', type: 'bytea' })
+  messageContent: Buffer;
 
   @Column({ name: 'timestamp', type: 'timestamp' })
   timestamp: Date;

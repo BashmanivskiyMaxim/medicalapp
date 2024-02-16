@@ -1,6 +1,8 @@
 export class MedicalHistoryModel {
   id: number;
   patientId: number;
-  medicalProcedureId: number;
-  date: Date;
+  medicalProcedureId?: number;
+  medicalInfo?: any;
+  createdDate?: Date;
+  updatedDate?: Date;
 }

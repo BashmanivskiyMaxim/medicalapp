@@ -18,12 +18,18 @@ export class MedicalHistoryEntity {
   @JoinColumn({ name: 'patient_id' })
   patient: PatientEntity;
 
-  @Column({ name: 'date' })
-  date: string;
+  @Column({ name: 'created_date' })
+  created_date: Date;
+
+  @Column({ name: 'updated_date' })
+  updated_date: Date;
 
   @OneToMany(
     () => MedicalProcedureEntity,
     (procedure) => procedure.medicalHistory,
   )
   procedures: MedicalProcedureEntity[];
+
+  @Column({ name: 'medical_info', type: 'json' })
+  medical_info: any;
 }

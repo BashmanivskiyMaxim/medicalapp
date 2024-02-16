@@ -21,4 +21,13 @@ export class MedicalProcedureEntity {
   @ManyToOne(() => MedicalHistoryEntity)
   @JoinColumn({ name: 'medical_history_id' })
   medicalHistory: MedicalHistoryEntity;
+
+  @Column({ name: 'created_date' })
+  created_date: Date;
+
+  @Column({ name: 'updated_date' })
+  updated_date: Date;
+
+  @Column({ name: 'procedure_info', type: 'json' })
+  procedure_info: any;
 }

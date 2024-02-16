@@ -27,6 +27,9 @@ export class DatabaseMedicalProcedureRepository
         procedureType: medicalProcedure.procedureType,
         description: medicalProcedure.description,
         medicalHistory: { id: medicalProcedure.id },
+        created_date: medicalProcedure.createdDate,
+        updated_date: medicalProcedure.updatedDate,
+        procedure_info: medicalProcedure.procedureInfo,
       },
     );
     return this.medicalProcedureEntityRepository.save(medicalProcedureEntity);
@@ -38,6 +41,10 @@ export class DatabaseMedicalProcedureRepository
       id: medicalProcedure.id,
       procedureType: medicalProcedure.procedureType,
       description: medicalProcedure.description,
+      medicalHistory: { id: medicalProcedure.id },
+      created_date: medicalProcedure.createdDate,
+      updated_date: medicalProcedure.updatedDate,
+      procedure_info: medicalProcedure.procedureInfo,
     });
   }
   deleteMedicalProcedure(

@@ -9,12 +9,12 @@ export class MedicalHistoryPresenter {
   @ApiProperty()
   medicalProcedureId: number;
   @ApiProperty()
-  date: Date;
+  createdDate: Date;
 
   constructor(medicalHistory: MedicalHistoryModel) {
     this.id = medicalHistory.id;
     this.patientId = medicalHistory.patientId;
     this.medicalProcedureId = medicalHistory.medicalProcedureId;
-    this.date = medicalHistory.date;
+    this.createdDate = medicalHistory.createdDate;
   }
 }

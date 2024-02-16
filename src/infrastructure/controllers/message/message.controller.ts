@@ -6,6 +6,8 @@ import {
   UseGuards,
   Request,
   Get,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import {
   ApiExtraModels,
@@ -56,5 +58,14 @@ export class MessageController {
       .getInstance()
       .getMessages(request.user);
     return messages;
+  }
+
+  @Delete('delete/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'delete message' })
+  async deleteMessage(@Request() request: any, @Param('id') id: string) {
+    await this.addMessageUseCasesProxy
+      .getInstance()
+      .deleteMessage(id, request.user);
   }
 }

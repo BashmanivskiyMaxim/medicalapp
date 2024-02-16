@@ -18,15 +18,25 @@ export class DatabaseMedicalHistoryRepository
   ) {
     super(medicalHistoryEntityRepository);
   }
-  deleteMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
-    return this.medicalHistoryEntityRepository.delete(medicalHistory.id);
+  getMedicalHistory(): Promise<any> {
+    return this.medicalHistoryEntityRepository.find();
+  }
+  getMedicalHistoryById(medicalHistoryId: number): Promise<any> {
+    return this.medicalHistoryEntityRepository.findOne({
+      where: { id: medicalHistoryId },
+    });
+  }
+  deleteMedicalHistory(medicalHistoryId: number): Promise<any> {
+    return this.medicalHistoryEntityRepository.delete(medicalHistoryId);
   }
 
   createMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
     const medicalHistoryEntity = this.medicalHistoryEntityRepository.create({
       id: medicalHistory.id,
       patient: { id: medicalHistory.patientId },
-      date: medicalHistory.date.toISOString(), // Convert date to string
+      created_date: medicalHistory.createdDate,
+      updated_date: medicalHistory.updatedDate,
+      medical_info: medicalHistory.medicalInfo,
     });
     return this.medicalHistoryEntityRepository.save(medicalHistoryEntity);
   }
@@ -35,7 +45,9 @@ export class DatabaseMedicalHistoryRepository
     return this.medicalHistoryEntityRepository.update(medicalHistory.id, {
       id: medicalHistory.id,
       patient: { id: medicalHistory.patientId },
-      date: medicalHistory.date.toISOString(), // Convert date to string
+      created_date: medicalHistory.createdDate,
+      updated_date: medicalHistory.updatedDate,
+      medical_info: medicalHistory.medicalInfo,
     });
   }
 }

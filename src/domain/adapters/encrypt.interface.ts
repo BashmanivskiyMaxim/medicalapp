@@ -1,4 +1,4 @@
 export interface IEncryptService {
-  encrypt(data: string): Promise<string>;
-  decrypt(encryptedData: string): Promise<string>;
+  encrypt(text: string): Promise<Buffer>;
+  decrypt(encryptedText: Buffer): Promise<string>;
 }
