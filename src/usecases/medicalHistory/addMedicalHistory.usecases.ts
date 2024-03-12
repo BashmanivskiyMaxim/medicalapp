@@ -1,21 +1,29 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { MedicalHistoryModel } from 'src/domain/model/medicalHistoryModel';
+import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
 import { MedicalHistoryRepository } from 'src/domain/repositories/medicalHistory.repository.interface';
+import { PatientRepository } from 'src/domain/repositories/patient.repository.interface';
 
 export class addMedicalHistoryUseCases {
   constructor(
     private readonly logger: ILogger,
     private readonly medicalHistoryRepository: MedicalHistoryRepository,
+    private readonly patientRepository: PatientRepository,
+    private readonly doctorRepository: DoctorRepository,
   ) {}
   async execute(
     data: MedicalHistoryModel,
     account: any,
   ): Promise<MedicalHistoryModel> {
     this.ensureIsDoctor(account.accountType);
+    console.log(account);
+    await this.ensureIsExistencePatient(data.patientId, account.id);
     const medicalHistory = new MedicalHistoryModel();
-    medicalHistory.id = data.id;
     medicalHistory.patientId = data.patientId;
+    medicalHistory.medicalInfo = data.medicalInfo;
+    medicalHistory.createdDate = new Date();
+    medicalHistory.updatedDate = new Date();
     const result =
       await this.medicalHistoryRepository.createMedicalHistory(medicalHistory);
     this.logger.log(
@@ -31,21 +39,43 @@ export class addMedicalHistoryUseCases {
       );
     }
   }
+  private async ensureIsExistencePatient(patientId: number, accountId: number) {
+    const doctor = await this.doctorRepository.findByAccountId(accountId);
+    const result = await this.patientRepository.getPatient(
+      patientId,
+      doctor.id,
+    );
+    if (!result && !doctor) {
+      throw new ForbiddenException(
+        'Permission denied. Patient does not exist.',
+      );
+    }
+  }
+  private async ensureIsExistenceMedicalHistory(id: number): Promise<any> {
+    const result =
+      await this.medicalHistoryRepository.getMedicalHistoryById(id);
+    if (!result) {
+      throw new ForbiddenException(
+        'Permission denied. MedicalHistory does not exist.',
+      );
+    }
+    return result;
+  }
   async updateMedicalHistory(
     id: number,
     data: MedicalHistoryModel,
-    account: any,
+    accountDoctor: any,
   ): Promise<MedicalHistoryModel> {
-    if (account.accountType !== 'doctor' && account.accountType !== 'admin') {
-      throw new Error(
-        'Permission denied. Only doctors can execute this operation.',
-      );
-    }
+    this.ensureIsDoctor(accountDoctor.accountType);
+    await this.ensureIsExistenceMedicalHistory(id);
     const medicalHistory = new MedicalHistoryModel();
-    medicalHistory.id = data.id;
+    medicalHistory.medicalInfo = data.medicalInfo;
     medicalHistory.patientId = data.patientId;
-    const result =
-      await this.medicalHistoryRepository.updateMedicalHistory(medicalHistory);
+    medicalHistory.updatedDate = new Date();
+    const result = await this.medicalHistoryRepository.updateMedicalHistory(
+      id,
+      medicalHistory,
+    );
     this.logger.log(
       'updateMedicalHistoryUseCases execute',
       'MedicalHistory have been updated',
@@ -55,6 +85,11 @@ export class addMedicalHistoryUseCases {
 
   async deleteMedicalHistory(id: number, accountDoctor: any): Promise<any> {
     this.ensureIsDoctor(accountDoctor.accountType);
+    const medicalHistory = await this.ensureIsExistenceMedicalHistory(id);
+    await this.ensureIsExistencePatient(
+      medicalHistory.patientId,
+      accountDoctor.id,
+    );
     const result = await this.medicalHistoryRepository.deleteMedicalHistory(id);
     this.logger.log(
       'deleteMedicalHistoryUseCases execute',

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MedicalHistoryModel } from 'src/domain/model/medicalHistoryModel';
 
 export class MedicalHistoryPresenter {
   @ApiProperty()
@@ -7,14 +6,17 @@ export class MedicalHistoryPresenter {
   @ApiProperty()
   patientId: number;
   @ApiProperty()
-  medicalProcedureId: number;
-  @ApiProperty()
   createdDate: Date;
+  @ApiProperty()
+  updatedDate: Date;
+  @ApiProperty()
+  medicalInfo: object;
 
-  constructor(medicalHistory: MedicalHistoryModel) {
+  constructor(medicalHistory: any) {
     this.id = medicalHistory.id;
     this.patientId = medicalHistory.patientId;
-    this.medicalProcedureId = medicalHistory.medicalProcedureId;
     this.createdDate = medicalHistory.createdDate;
+    this.updatedDate = medicalHistory.updatedDate;
+    this.medicalInfo = medicalHistory.medicalInfo;
   }
 }

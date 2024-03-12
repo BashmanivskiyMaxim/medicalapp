@@ -1,6 +1,6 @@
 export class DoctorModel {
   id?: number;
   accountId?: number;
-  specialty: string;
-  qualification: string;
+  specialty?: string;
+  qualification?: string;
 }

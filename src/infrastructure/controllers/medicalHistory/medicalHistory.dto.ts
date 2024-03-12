@@ -1,15 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsObject } from 'class-validator';
 
 export class AddMedicalHistoryDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
+  @IsObject()
+  readonly medicalInfo: object;
+  @ApiProperty({ required: true })
   @IsNumber()
-  readonly id: number;
-  @IsNumber()
+  @IsNotEmpty()
   readonly patientId: number;
-  @IsNumber()
-  readonly medicalProcedureId: number;
-  @IsDate()
-  readonly date: Date;
 }

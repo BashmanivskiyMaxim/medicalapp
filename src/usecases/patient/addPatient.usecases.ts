@@ -28,14 +28,16 @@ export class addPatientUseCases {
       );
     }
   }
-  async execute(accountDoctor: any, patientId: number): Promise<PatientModel> {
+  async execute(data: PatientModel, accountDoctor: any): Promise<PatientModel> {
     this.ensureIsDoctor(accountDoctor.accountType);
     const doctor = await this.doctorRepository.findByAccountId(
       +accountDoctor.id,
     );
     const patient = new PatientModel();
-    patient.accountId = +patientId;
-    patient.doctorId = +doctor.id;
+    patient.accountId = data.accountId;
+    patient.doctorId = doctor.id;
+    patient.recovery_status = data.recovery_status;
+    patient.additional_info = data.additional_info;
     const result = await this.patientRepository.createPatient(patient);
     this.logger.log(
       'addPatientUseCases execute',
@@ -44,7 +46,6 @@ export class addPatientUseCases {
     return result;
   }
 
-  // add patient complete info to db
   async deletePatient(
     accountDoctor: any,
     patient_id: string,

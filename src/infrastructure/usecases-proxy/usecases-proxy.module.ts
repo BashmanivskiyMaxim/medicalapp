@@ -195,16 +195,25 @@ export class UsecasesProxyModule {
             ),
         },
         {
-          inject: [LoggerService, DatabaseMedicalHistoryRepository],
+          inject: [
+            LoggerService,
+            DatabaseMedicalHistoryRepository,
+            DatabasePatientRepository,
+            DatabaseDoctorRepository,
+          ],
           provide: UsecasesProxyModule.POST_MEDICALHISTORY_USECASES_PROXY,
           useFactory: (
             loggerService: LoggerService,
             databaseMedicalHistoryRepository: DatabaseMedicalHistoryRepository,
+            databasePatientRepository: DatabasePatientRepository,
+            databaseDoctorRepository: DatabaseDoctorRepository,
           ) =>
             new UseCaseProxy(
               new addMedicalHistoryUseCases(
                 loggerService,
                 databaseMedicalHistoryRepository,
+                databasePatientRepository,
+                databaseDoctorRepository,
               ),
             ),
         },

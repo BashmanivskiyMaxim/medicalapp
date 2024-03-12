@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -18,6 +19,7 @@ import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { addPatientUseCases } from 'src/usecases/patient/addPatient.usecases';
 import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
+import { AddPatientDto } from './patient.dto';
 
 @Controller('patient')
 @ApiTags('patient')
@@ -29,14 +31,14 @@ export class PatientController {
     private readonly addPatientUseCasesProxy: UseCaseProxy<addPatientUseCases>,
   ) {}
 
-  @Post('add/:accountId')
+  @Post('add')
   @ApiResponse({ type: PatientPresenter })
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'createPatient' })
-  async addPatient(@Req() request: any) {
+  async addPatient(@Body() addPatientDto: AddPatientDto, @Req() request: any) {
     const patientCreated = await this.addPatientUseCasesProxy
       .getInstance()
-      .execute(request.user, +request.params.accountId);
+      .execute(addPatientDto, request.user);
     return new PatientPresenter(patientCreated);
   }
 

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { Repository } from 'typeorm';
 import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { PatientEntity } from '../entities/patient.entity';
@@ -22,6 +21,8 @@ export class DatabasePatientRepository
     const patientEntity = this.patientEntityRepository.create({
       account: { id: patient.accountId },
       doctor: { id: patient.doctorId },
+      recovery_status: patient.recovery_status,
+      additional_info: patient.additional_info,
     });
     return this.patientEntityRepository.save(patientEntity);
   }
@@ -37,7 +38,6 @@ export class DatabasePatientRepository
   getPatient(patientId: number, doctorId: number): Promise<any> {
     return this.patientEntityRepository.findOne({
       where: { id: patientId, doctor: { id: doctorId } },
-      // add complete patient info to db
     });
   }
   getPatients(doctorId: number): Promise<any> {

@@ -32,7 +32,6 @@ export class DatabaseMedicalHistoryRepository
 
   createMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
     const medicalHistoryEntity = this.medicalHistoryEntityRepository.create({
-      id: medicalHistory.id,
       patient: { id: medicalHistory.patientId },
       created_date: medicalHistory.createdDate,
       updated_date: medicalHistory.updatedDate,
@@ -41,9 +40,11 @@ export class DatabaseMedicalHistoryRepository
     return this.medicalHistoryEntityRepository.save(medicalHistoryEntity);
   }
 
-  updateMedicalHistory(medicalHistory: MedicalHistoryModel): Promise<any> {
-    return this.medicalHistoryEntityRepository.update(medicalHistory.id, {
-      id: medicalHistory.id,
+  updateMedicalHistory(
+    id: number,
+    medicalHistory: MedicalHistoryModel,
+  ): Promise<any> {
+    return this.medicalHistoryEntityRepository.update(id, {
       patient: { id: medicalHistory.patientId },
       created_date: medicalHistory.createdDate,
       updated_date: medicalHistory.updatedDate,
