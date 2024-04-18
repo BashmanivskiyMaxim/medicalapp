@@ -1,8 +1,8 @@
-import { ILogger } from 'src/domain/logger/logger.interface';
-import { PatientRepository } from 'src/domain/repositories/patient.repository.interface';
-import { PatientModel } from 'src/domain/model/patientModel';
+import { ILogger } from '../../domain/logger/logger.interface';
+import { PatientRepository } from '../../domain/repositories/patient.repository.interface';
+import { PatientModel } from '../../domain/model/patientModel';
 import { ForbiddenException } from '@nestjs/common';
-import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
+import { DoctorRepository } from '../../domain/repositories/doctor.repository.interface';
 import { EntityValidator } from '../utils/checkExistense.usecases';
 
 export class addPatientUseCases {

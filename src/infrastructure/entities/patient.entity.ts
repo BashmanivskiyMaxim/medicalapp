@@ -4,9 +4,10 @@ import {
   JoinColumn,
   ManyToOne,
   Column,
+  OneToMany,
 } from 'typeorm';
 import { AccountEntity } from './account.entity';
-import { DoctorEntity } from './doctor.entity';
+import { PatientProcedureEntity } from './patientProcedure.entity';
 
 @Entity('patient')
 export class PatientEntity {
@@ -17,9 +18,11 @@ export class PatientEntity {
   @JoinColumn({ name: 'account_id' })
   account: AccountEntity;
 
-  @ManyToOne(() => DoctorEntity, (doctor) => doctor.account)
-  @JoinColumn({ name: 'doctor_id' })
-  doctor: DoctorEntity;
+  @OneToMany(
+    () => PatientProcedureEntity,
+    (patientProcedure) => patientProcedure.patient,
+  )
+  procedures: PatientProcedureEntity[];
 
   @Column({ name: 'recovery_status', default: false })
   recovery_status: boolean;

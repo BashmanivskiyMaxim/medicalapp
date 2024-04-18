@@ -1,4 +1,4 @@
-import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
+import { AccountRepository } from '../../domain/repositories/account.repository.interface';
 import { ILogger } from '../../domain/logger/logger.interface';
 import { NotFoundException } from '@nestjs/common';
 

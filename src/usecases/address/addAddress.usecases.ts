@@ -1,6 +1,6 @@
-import { ILogger } from 'src/domain/logger/logger.interface';
-import { AddressRepository } from 'src/domain/repositories/address.repository.interface';
-import { AddressModel } from 'src/domain/model/addressModel';
+import { ILogger } from '../../domain/logger/logger.interface';
+import { AddressRepository } from '../../domain/repositories/address.repository.interface';
+import { AddressModel } from '../../domain/model/addressModel';
 import { EntityValidator } from '../utils/checkExistense.usecases';
 import { ConflictException } from '@nestjs/common';
 

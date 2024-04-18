@@ -1,6 +1,6 @@
-import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
+import { AccountRepository } from '../../domain/repositories/account.repository.interface';
 import { ILogger } from '../../domain/logger/logger.interface';
-import { UserM } from 'src/domain/model/accountModel';
+import { UserM } from '../../domain/model/accountModel';
 import { NotFoundException } from '@nestjs/common';
 
 export class UpdateAccountUseCases {

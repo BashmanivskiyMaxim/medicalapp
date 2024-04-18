@@ -1,7 +1,7 @@
-import { ILogger } from 'src/domain/logger/logger.interface';
-import { MessageModel } from 'src/domain/model/messageModel';
-import { MessageRepository } from 'src/domain/repositories/message.repository.interface';
-import { IEncryptService } from 'src/domain/adapters/encrypt.interface';
+import { ILogger } from '../../domain/logger/logger.interface';
+import { MessageModel } from '../../domain/model/messageModel';
+import { MessageRepository } from '../../domain/repositories/message.repository.interface';
+import { IEncryptService } from '../../domain/adapters/encrypt.interface';
 
 export class addMessageUseCases {
   constructor(

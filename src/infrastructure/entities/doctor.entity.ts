@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { AccountEntity } from './account.entity';
+import { ProcedureEntity } from './procedure.entity';
 
 @Entity('doctor')
 export class DoctorEntity {
@@ -21,4 +23,7 @@ export class DoctorEntity {
   @ManyToOne(() => AccountEntity, (account) => account.doctors)
   @JoinColumn({ name: 'account_id' })
   account: AccountEntity;
+
+  @OneToMany(() => ProcedureEntity, (procedure) => procedure.doctor)
+  procedures: ProcedureEntity[];
 }

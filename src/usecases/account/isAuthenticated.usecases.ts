@@ -1,4 +1,4 @@
-import { AccountModel, UserM } from 'src/domain/model/accountModel';
+import { AccountModel, UserM } from '../../domain/model/accountModel';
 import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
 
 export class IsAuthenticatedUseCases {

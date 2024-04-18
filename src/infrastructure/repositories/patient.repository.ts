@@ -20,29 +20,26 @@ export class DatabasePatientRepository
   createPatient(patient: PatientModel): Promise<any> {
     const patientEntity = this.patientEntityRepository.create({
       account: { id: patient.accountId },
-      doctor: { id: patient.doctorId },
       recovery_status: patient.recovery_status,
       additional_info: patient.additional_info,
+      procedures: patient.procedures,
     });
     return this.patientEntityRepository.save(patientEntity);
   }
   updatePatient(patient: PatientModel): Promise<any> {
     return this.patientEntityRepository.update(patient.id, {
       account: { id: patient.accountId },
-      doctor: { id: patient.doctorId },
     });
   }
   deletePatient(patientId: number): Promise<any> {
     return this.patientEntityRepository.delete(patientId);
   }
-  getPatient(patientId: number, doctorId: number): Promise<any> {
+  getPatient(patientId: number): Promise<any> {
     return this.patientEntityRepository.findOne({
-      where: { id: patientId, doctor: { id: doctorId } },
+      where: { id: patientId },
     });
   }
-  getPatients(doctorId: number): Promise<any> {
-    return this.patientEntityRepository.find({
-      where: { doctor: { id: doctorId } },
-    });
+  getPatients(): Promise<any> {
+    return this.patientEntityRepository.find();
   }
 }

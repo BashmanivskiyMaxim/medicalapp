@@ -1,6 +1,6 @@
 import { ILogger } from 'src/domain/logger/logger.interface';
-import { AccountModel } from 'src/domain/model/accountModel';
-import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
+import { AccountModel } from '../../domain/model/accountModel';
+import { AccountRepository } from '../../domain/repositories/account.repository.interface';
 
 export class getAccountByEmailUseCases {
   constructor(

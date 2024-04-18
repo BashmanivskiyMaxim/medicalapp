@@ -1,6 +1,6 @@
-import { ILogger } from 'src/domain/logger/logger.interface';
-import { ContactInfoRepository } from 'src/domain/repositories/contactInfo.repository.interface';
-import { ContactInfoModel } from 'src/domain/model/contactInfoModel';
+import { ILogger } from '../../domain/logger/logger.interface';
+import { ContactInfoRepository } from '../../domain/repositories/contactInfo.repository.interface';
+import { ContactInfoModel } from '../../domain/model/contactInfoModel';
 import { ConflictException } from '@nestjs/common';
 import { EntityValidator } from '../utils/checkExistense.usecases';
 

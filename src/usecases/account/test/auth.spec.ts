@@ -1,4 +1,4 @@
-import { UserM } from 'src/domain/model/accountModel';
+import { UserM } from '../../../domain/model/accountModel';
 import { IBcryptService } from '../../../domain/adapters/bcrypt.interface';
 import { IJwtService } from '../../../domain/adapters/jwt.interface';
 import { JWTConfig } from '../../../domain/config/jwt.interface';

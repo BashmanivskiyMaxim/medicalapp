@@ -14,6 +14,10 @@ import { LoggerService } from './infrastructure/logger/logger.service';
 async function bootstrap() {
   const env = process.env.NODE_ENV;
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: 'http://localhost:3001',
+    credentials: true,
+  });
 
   app.use(cookieParser());
 

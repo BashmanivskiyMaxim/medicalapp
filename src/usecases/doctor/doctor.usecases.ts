@@ -1,6 +1,6 @@
-import { ILogger } from 'src/domain/logger/logger.interface';
-import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
-import { DoctorModel } from 'src/domain/model/doctorModel';
+import { ILogger } from '../../domain/logger/logger.interface';
+import { DoctorRepository } from '../../domain/repositories/doctor.repository.interface';
+import { DoctorModel } from '../../domain/model/doctorModel';
 import { ForbiddenException } from '@nestjs/common';
 import { EntityValidator } from '../utils/checkExistense.usecases';
 

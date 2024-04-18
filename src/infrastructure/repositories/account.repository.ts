@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { AccountEntity } from '../entities/account.entity';
 import { AccountRepository } from '../../domain/repositories/account.repository.interface';
-import { AccountModel, UserM } from 'src/domain/model/accountModel';
+import { AccountModel, UserM } from '../../domain/model/accountModel';
 
 @Injectable()
 export class DatabaseAccountRepository

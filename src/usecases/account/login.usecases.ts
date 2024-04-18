@@ -1,4 +1,4 @@
-import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
+import { AccountRepository } from '../../domain/repositories/account.repository.interface';
 import { IBcryptService } from '../../domain/adapters/bcrypt.interface';
 import {
   IJwtService,

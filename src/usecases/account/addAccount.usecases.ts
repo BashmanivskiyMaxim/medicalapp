@@ -5,8 +5,8 @@ import {
 } from 'src/domain/adapters/jwt.interface';
 import { JWTConfig } from 'src/domain/config/jwt.interface';
 import { ILogger } from 'src/domain/logger/logger.interface';
-import { UserM } from 'src/domain/model/accountModel';
-import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
+import { UserM } from '../../domain/model/accountModel';
+import { AccountRepository } from '../../domain/repositories/account.repository.interface';
 import { ForbiddenException, ConflictException } from '@nestjs/common';
 
 export class addAccountUseCases {
