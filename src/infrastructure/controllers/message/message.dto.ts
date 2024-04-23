@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
-  IsNumber,
   IsString,
   MinLength,
   MaxLength,
+  IsEmail,
 } from 'class-validator';
 
 const MIN_LENGTH = 1;
@@ -13,8 +13,8 @@ const MAX_LENGTH = 100;
 export class AddMessageDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
-  @IsNumber()
-  readonly receiverId: number;
+  @IsEmail()
+  readonly receiverEmail: string;
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsString()

@@ -37,6 +37,7 @@ import { IsSignUpPresenter } from './signup.presenter';
 import { DeleteUseCases } from 'src/usecases/account/deleteMyAccount.usecases';
 import { UpdateDto } from './update-dto.class';
 import { UpdateAccountUseCases } from 'src/usecases/account/update_account.usecases';
+import { GetAccountUseCases } from 'src/usecases/account/getMyAccount.usecases';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -60,6 +61,8 @@ export class AuthController {
     private readonly deleteMyAccountUsecaseProxy: UseCaseProxy<DeleteUseCases>,
     @Inject(UsecasesProxyModule.UPDATE_ACCOUNT_USECASES_PROXY)
     private readonly updateMyAccountUsecaseProxy: UseCaseProxy<UpdateAccountUseCases>,
+    @Inject(UsecasesProxyModule.GET_ACCOUNT_USECASES_PROXY)
+    private readonly getAccountUsecaseProxy: UseCaseProxy<GetAccountUseCases>,
   ) {}
 
   @Post('login')
@@ -168,5 +171,17 @@ export class AuthController {
       .getInstance()
       .updateAccountInfo(user_id, updateDto);
     return 'Update successful';
+  }
+
+  @Get('get_my_account')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ description: 'get' })
+  async getMyAccount(@Req() request: any) {
+    const user_id = request.user.id;
+    const user = await this.getAccountUsecaseProxy
+      .getInstance()
+      .getAccountInfo(user_id);
+    return user;
   }
 }

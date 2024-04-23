@@ -73,8 +73,22 @@ export class DatabaseAccountRepository
   findAccountByUsername(username: string): Promise<any> {
     return this.AccountEntityRepository.findOne({ where: { username } });
   }
-  findAccountById(id: number): Promise<any> {
-    return this.AccountEntityRepository.findOne({ where: { id } });
+  async findAccountById(id: number): Promise<AccountModel> {
+    const user: AccountModel = new AccountModel();
+    const account = await this.AccountEntityRepository.findOne({
+      where: { id },
+    });
+    user.id = account.id;
+    user.createDate = account.createdate;
+    user.updatedDate = account.updateddate;
+    user.lastLogin = account.last_login;
+    user.username = account.username;
+    user.email = account.email;
+    user.firstName = account.firstName;
+    user.lastName = account.lastName;
+    user.accountType = account.accountType;
+
+    return user;
   }
   updateAccountById(id: string, data: any): Promise<any> {
     return this.AccountEntityRepository.save({ id, ...data });

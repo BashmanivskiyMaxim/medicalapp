@@ -1,21 +1,32 @@
 import { ILogger } from '../../domain/logger/logger.interface';
-import { MessageModel } from '../../domain/model/messageModel';
+import {
+  MessageModel,
+  MessageModelEmail,
+} from '../../domain/model/messageModel';
 import { MessageRepository } from '../../domain/repositories/message.repository.interface';
 import { IEncryptService } from '../../domain/adapters/encrypt.interface';
+import { AccountRepository } from 'src/domain/repositories/account.repository.interface';
 
 export class addMessageUseCases {
   constructor(
     private readonly logger: ILogger,
     private readonly messageRepository: MessageRepository,
     private readonly encryptService: IEncryptService,
+    private readonly userRepository: AccountRepository,
   ) {}
-  async execute(data: MessageModel, accountSender: any): Promise<MessageModel> {
-    if (accountSender.id === data.receiverId) {
+  async execute(
+    data: MessageModelEmail,
+    accountSender: any,
+  ): Promise<MessageModel> {
+    const reciever = await this.userRepository.findAccountByEmail(
+      data.receiverEmail,
+    );
+    if (accountSender.id === reciever.id) {
       throw new Error('You cannot send a message to yourself');
     }
     const message = new MessageModel();
     message.senderId = accountSender.id;
-    message.receiverId = data.receiverId;
+    message.receiverId = reciever.id;
     message.role = accountSender.accountType;
     message.messageContent = data.messageContent;
     message.timestamp = new Date();

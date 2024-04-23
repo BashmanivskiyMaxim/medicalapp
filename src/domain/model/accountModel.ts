@@ -3,7 +3,6 @@ export class AccountModel {
   createDate?: Date;
   updatedDate?: Date;
   lastLogin?: Date;
-  hashRefreshToken?: string;
   username?: string;
   email?: string;
   firstName?: string;
@@ -13,4 +12,5 @@ export class AccountModel {
 
 export class UserM extends AccountModel {
   password: string;
+  hashRefreshToken?: string;
 }
