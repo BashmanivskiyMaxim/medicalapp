@@ -5,6 +5,7 @@ stages:
   - lint
   - test
   - build
+  - deploy
 
 cache:
   paths:
@@ -37,9 +38,13 @@ build:
   script:
     - npm run build
 
-#deploy:
-#  stage: deploy
-#  script:
-#    - npm start:prod
-#  only:
-#    - master  # Deploy only when changes are pushed to the master branch
+deploy:
+  stage: deploy
+  image: ubuntu
+  only:
+    - pushes
+    - main
+  script:
+    - apt-get update && apt-get install -y curl
+    - curl -fsSL https://railway.app/install.sh | sh
+    - railway up --service=$RAILWAY_SERVICE_NAME -d
