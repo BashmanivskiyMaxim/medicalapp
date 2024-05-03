@@ -1,0 +1,45 @@
+image: node:alpine
+
+stages:
+  - install_dependencies
+  - lint
+  - test
+  - build
+
+cache:
+  paths:
+    - node_modules/
+
+install_dependencies:
+  stage: install_dependencies
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
+
+lint:
+  stage: lint
+  script:
+    - npm run lint
+
+test:
+  stage: test
+  script:
+    - npm test
+  coverage: '/All lines: (\d+\.\d+)%/'
+  artifacts:
+    paths:
+      - coverage/
+
+build:
+  stage: build
+  script:
+    - npm run build
+
+#deploy:
+#  stage: deploy
+#  script:
+#    - npm start:prod
+#  only:
+#    - master  # Deploy only when changes are pushed to the master branch
