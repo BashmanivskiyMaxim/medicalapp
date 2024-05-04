@@ -39,8 +39,8 @@ async function bootstrap() {
     const config = new DocumentBuilder()
       .addBearerAuth()
       .setTitle('Clean Architecture Nestjs')
-      .setDescription('Example')
-      .setVersion('1.0')
+      .setDescription('beta')
+      .setVersion('1.3')
       .build();
     const document = SwaggerModule.createDocument(app, config, {
       extraModels: [ResponseFormat],
@@ -48,7 +48,7 @@ async function bootstrap() {
     });
     SwaggerModule.setup('api', app, document);
   }
-
-  await app.listen(3000);
+  console.log('PORT:', process.env.PORT);
+  await app.listen(process.env.PORT, '0.0.0.0');
 }
 bootstrap();
