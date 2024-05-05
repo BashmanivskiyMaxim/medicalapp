@@ -17,9 +17,10 @@ export class DatabaseProcedureRepository
   }
   createProcedure(procedure: ProcedureModel): Promise<any> {
     const procedureEntity = this.procedureEntityRepository.create({
+      doctor: { id: procedure.doctorId },
       procedureName: procedure.procedureName,
       procedureDescription: procedure.procedureDescription,
-      averageRating: procedure.averageRating,
+      averageRating: 0,
     });
     return this.procedureEntityRepository.save(procedureEntity);
   }

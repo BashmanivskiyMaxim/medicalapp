@@ -7,4 +7,5 @@ export interface DoctorRepository {
   getDoctor(doctor: DoctorModel): Promise<any>;
   getDoctors(): Promise<any>;
   findByAccountId(accountId: number): Promise<any>;
+  findByUsername(username: string): Promise<any>;
 }

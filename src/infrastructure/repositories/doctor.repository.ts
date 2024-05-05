@@ -48,4 +48,9 @@ export class DatabaseDoctorRepository
       where: { account: { id: accountId } },
     });
   }
+  findByUsername(username: string): Promise<any> {
+    return this.doctorEntityRepository.findOne({
+      where: { account: { username: username } },
+    });
+  }
 }

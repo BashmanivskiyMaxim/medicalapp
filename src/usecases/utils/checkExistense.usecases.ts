@@ -6,9 +6,18 @@ export class EntityValidator implements IEntityValidator {
     this.repository = repository;
   }
 
+  private throwErrorIfExists(
+    condition: boolean,
+    message: string,
+    errorType: any,
+  ) {
+    if (condition) {
+      throw new errorType(message);
+    }
+  }
+
   async uniqueness(property: string, value: any): Promise<void> {
     const existingEntity = await this.repository.findByProperty(value);
-
     if (existingEntity) {
       throw new ConflictException(`${property} already exists`);
     }
@@ -16,12 +25,32 @@ export class EntityValidator implements IEntityValidator {
 
   async existence(id: string, throwErrorIfExists: boolean = false) {
     const existingEntity = await this.repository.findByAccountId(+id);
-    if (existingEntity && throwErrorIfExists) {
-      throw new ConflictException('Entity already exists');
-    }
+    this.throwErrorIfExists(
+      existingEntity && throwErrorIfExists,
+      'Entity already exists',
+      ConflictException,
+    );
+    this.throwErrorIfExists(
+      !existingEntity && !throwErrorIfExists,
+      'Entity does not exist',
+      NotFoundException,
+    );
+  }
 
-    if (!existingEntity && !throwErrorIfExists) {
-      throw new NotFoundException('Entity does not exist');
-    }
+  async existenceByUsername(
+    username: string,
+    throwErrorIfExists: boolean = false,
+  ) {
+    const existingEntity = await this.repository.findByUsername(username);
+    this.throwErrorIfExists(
+      existingEntity && throwErrorIfExists,
+      'Entity already exists',
+      ConflictException,
+    );
+    this.throwErrorIfExists(
+      !existingEntity && !throwErrorIfExists,
+      'Entity does not exist',
+      NotFoundException,
+    );
   }
 }

@@ -6,6 +6,7 @@ import { AddressController } from './address/address.controller';
 import { AuthController } from './auth/auth.controller';
 import { ContactInfoController } from './contactInfo/contactInfo.controller';
 import { MessageController } from './message/message.controller';
+import { ProcedureController } from './procedure/procedure.controller';
 
 @Module({
   imports: [UsecasesProxyModule.regiter()],
@@ -16,6 +17,7 @@ import { MessageController } from './message/message.controller';
     AuthController,
     ContactInfoController,
     MessageController,
+    ProcedureController,
   ],
 })
 export class ControllersModule {}

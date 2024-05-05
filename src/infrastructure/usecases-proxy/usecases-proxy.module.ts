@@ -32,6 +32,8 @@ import { EntityValidator } from '../../usecases/utils/checkExistense.usecases';
 import { EncryptModule } from '../services/encrypt/encrypt.module';
 import { EncryptService } from '../services/encrypt/encrypt.service';
 import { GetAccountUseCases } from 'src/usecases/account/getMyAccount.usecases';
+import { DatabaseProcedureRepository } from '../repositories/procedure.repository';
+import { addProcedureUseCases } from 'src/usecases/procedure/procedure.usecases';
 
 @Module({
   imports: [
@@ -58,6 +60,8 @@ export class UsecasesProxyModule {
   static LOGOUT_USECASES_PROXY = 'LogoutUseCasesProxy';
   static DELETE_ACCOUNT_USECASES_PROXY = 'DeleteAccountUseCasesProxy';
   static UPDATE_ACCOUNT_USECASES_PROXY = 'UpdateAccountUseCasesProxy';
+  static POST_PROCEDURE_USECASES_PROXY = 'postProcedureUseCasesProxy';
+
   static regiter(): DynamicModule {
     return {
       module: UsecasesProxyModule,
@@ -255,6 +259,27 @@ export class UsecasesProxyModule {
           provide: UsecasesProxyModule.LOGOUT_USECASES_PROXY,
           useFactory: () => new UseCaseProxy(new LogoutUseCases()),
         },
+        {
+          inject: [
+            LoggerService,
+            DatabaseProcedureRepository,
+            DatabaseDoctorRepository,
+          ],
+          provide: UsecasesProxyModule.POST_PROCEDURE_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseProcedureRepository: DatabaseProcedureRepository,
+            databaseDoctorRepository: DatabaseDoctorRepository,
+          ) =>
+            new UseCaseProxy(
+              new addProcedureUseCases(
+                loggerService,
+                databaseProcedureRepository,
+                new EntityValidator(databaseDoctorRepository),
+                databaseDoctorRepository,
+              ),
+            ),
+        },
       ],
       exports: [
         UsecasesProxyModule.POST_DOCTOR_USECASES_PROXY,
@@ -270,6 +295,7 @@ export class UsecasesProxyModule {
         UsecasesProxyModule.DELETE_ACCOUNT_USECASES_PROXY,
         UsecasesProxyModule.UPDATE_ACCOUNT_USECASES_PROXY,
         UsecasesProxyModule.GET_ACCOUNT_USECASES_PROXY,
+        UsecasesProxyModule.POST_PROCEDURE_USECASES_PROXY,
       ],
     };
   }
