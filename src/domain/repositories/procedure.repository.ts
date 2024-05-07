@@ -6,4 +6,8 @@ export interface ProcedureRepository {
   deleteProcedure(procedureId: number): Promise<any>;
   getProcedure(procedureId: number): Promise<any>;
   getProcedures(): Promise<any>;
+  getProcedureById(id: number): Promise<any>;
+  getProcedureByDoctorId(doctorId: number): Promise<any>;
+  getProcedureByProcedureName(procedureName: string): Promise<any>;
+  getDoctorByProcedureId(procedureId: number): Promise<any>;
 }

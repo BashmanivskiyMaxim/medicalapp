@@ -4,16 +4,16 @@ export class ProcedurePresenter {
   @ApiProperty()
   doctorId: number;
   @ApiProperty()
-  procedure_name: string;
+  procedureName: string;
   @ApiProperty()
-  procedure_description: string;
+  procedureDescription: string;
   @ApiProperty()
-  average_rating: number;
+  averageRating: number;
 
   constructor(procedure: any) {
     this.doctorId = procedure.doctorId;
-    this.procedure_name = procedure.procedure_name;
-    this.procedure_description = procedure.procedure_description;
-    this.average_rating = procedure.average_rating;
+    this.procedureName = procedure.procedureName;
+    this.procedureDescription = procedure.procedureDescription;
+    this.averageRating = procedure.averageRating;
   }
 }

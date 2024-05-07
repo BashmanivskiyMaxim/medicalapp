@@ -34,6 +34,8 @@ import { EncryptService } from '../services/encrypt/encrypt.service';
 import { GetAccountUseCases } from 'src/usecases/account/getMyAccount.usecases';
 import { DatabaseProcedureRepository } from '../repositories/procedure.repository';
 import { addProcedureUseCases } from 'src/usecases/procedure/procedure.usecases';
+import { DatabasePatientProcedureRepository } from '../repositories/patientProcedure.repository';
+import { addPatientProcedureUseCases } from 'src/usecases/PatientProcedure/patientProcedure.usecases';
 
 @Module({
   imports: [
@@ -61,6 +63,8 @@ export class UsecasesProxyModule {
   static DELETE_ACCOUNT_USECASES_PROXY = 'DeleteAccountUseCasesProxy';
   static UPDATE_ACCOUNT_USECASES_PROXY = 'UpdateAccountUseCasesProxy';
   static POST_PROCEDURE_USECASES_PROXY = 'postProcedureUseCasesProxy';
+  static POST_PATIENT_PROCEDURE_USECASES_PROXY =
+    'postPatientProcedureUseCasesProxy';
 
   static regiter(): DynamicModule {
     return {
@@ -280,6 +284,32 @@ export class UsecasesProxyModule {
               ),
             ),
         },
+        {
+          inject: [
+            LoggerService,
+            DatabaseProcedureRepository,
+            DatabaseDoctorRepository,
+            DatabasePatientRepository,
+            DatabasePatientProcedureRepository,
+          ],
+          provide: UsecasesProxyModule.POST_PATIENT_PROCEDURE_USECASES_PROXY,
+          useFactory: (
+            loggerService: LoggerService,
+            databaseProcedureRepository: DatabaseProcedureRepository,
+            databaseDoctorRepository: DatabaseDoctorRepository,
+            databasePatientRepository: DatabasePatientRepository,
+            databasePatientProcedureRepository: DatabasePatientProcedureRepository,
+          ) =>
+            new UseCaseProxy(
+              new addPatientProcedureUseCases(
+                loggerService,
+                databaseProcedureRepository,
+                databaseDoctorRepository,
+                databasePatientRepository,
+                databasePatientProcedureRepository,
+              ),
+            ),
+        },
       ],
       exports: [
         UsecasesProxyModule.POST_DOCTOR_USECASES_PROXY,
@@ -296,6 +326,7 @@ export class UsecasesProxyModule {
         UsecasesProxyModule.UPDATE_ACCOUNT_USECASES_PROXY,
         UsecasesProxyModule.GET_ACCOUNT_USECASES_PROXY,
         UsecasesProxyModule.POST_PROCEDURE_USECASES_PROXY,
+        UsecasesProxyModule.POST_PATIENT_PROCEDURE_USECASES_PROXY,
       ],
     };
   }

@@ -42,4 +42,9 @@ export class DatabasePatientRepository
   getPatients(): Promise<any> {
     return this.patientEntityRepository.find();
   }
+  getPatientByAccountId(accountId: number): Promise<any> {
+    return this.patientEntityRepository.findOne({
+      where: { account: { id: accountId } },
+    });
+  }
 }

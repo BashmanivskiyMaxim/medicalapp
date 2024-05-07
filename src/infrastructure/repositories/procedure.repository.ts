@@ -41,4 +41,29 @@ export class DatabaseProcedureRepository
   getProcedures(): Promise<any> {
     return this.procedureEntityRepository.find();
   }
+
+  async getProcedureByDoctorId(doctorId: number): Promise<any> {
+    return await this.procedureEntityRepository.find({
+      where: { doctor: { id: doctorId } },
+    });
+  }
+
+  async getProcedureByProcedureName(procedureName: string): Promise<any> {
+    return await this.procedureEntityRepository.find({
+      where: { procedureName: procedureName },
+    });
+  }
+
+  async getProcedureById(id: number): Promise<any> {
+    return await this.procedureEntityRepository.findOne({
+      where: { id: id },
+    });
+  }
+
+  async getDoctorByProcedureId(procedureId: number): Promise<any> {
+    return await this.procedureEntityRepository.findOne({
+      where: { id: procedureId },
+      relations: ['doctor'],
+    });
+  }
 }

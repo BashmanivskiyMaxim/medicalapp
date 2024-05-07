@@ -22,6 +22,7 @@ export class DatabasePatientProcedureRepository
       {
         patient: { id: patientProcedure.patientId },
         procedure: { id: patientProcedure.procedureId },
+        doctor: { id: patientProcedure.doctorId },
         procedureDate: patientProcedure.procedureDate,
         createdDate: patientProcedure.createdDate,
         updatedDate: patientProcedure.updatedDate,
@@ -32,9 +33,12 @@ export class DatabasePatientProcedureRepository
     );
     return this.patientProcedureEntityRepository.save(patientProcedureEntity);
   }
-  async updatePatientProcedure(patientProcedure: any): Promise<any> {
+  async updatePatientProcedure(
+    id: number,
+    patientProcedure: any,
+  ): Promise<any> {
     return this.patientProcedureEntityRepository.save({
-      id: patientProcedure.id,
+      id: id,
       ...patientProcedure,
     });
   }
