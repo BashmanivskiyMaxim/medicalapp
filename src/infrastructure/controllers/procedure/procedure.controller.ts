@@ -95,13 +95,13 @@ export class ProcedureController {
     return procedures.map((procedure) => new ProcedurePresenter(procedure));
   }
 
-  // @Patch('rate/:id')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiOperation({ description: 'rate' })
-  // async rateProcedure(@Param('id') id: string, @Request() request: any) {
-  //   const procedureRated = await this.addProcedureUseCasesProxy
-  //     .getInstance()
-  //     .rate(id, request.user);
-  //   return new ProcedurePresenter(procedureRated);
-  // }
+  @Patch('rate/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'rate' })
+  async rateProcedure(@Param('id') id: string, @Request() request: any) {
+    const procedureRated = await this.addProcedureUseCasesProxy
+      .getInstance()
+      .rate(id, request.user);
+    return new ProcedurePresenter(procedureRated);
+  }
 }

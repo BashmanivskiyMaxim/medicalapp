@@ -268,12 +268,14 @@ export class UsecasesProxyModule {
             LoggerService,
             DatabaseProcedureRepository,
             DatabaseDoctorRepository,
+            DatabasePatientProcedureRepository,
           ],
           provide: UsecasesProxyModule.POST_PROCEDURE_USECASES_PROXY,
           useFactory: (
             loggerService: LoggerService,
             databaseProcedureRepository: DatabaseProcedureRepository,
             databaseDoctorRepository: DatabaseDoctorRepository,
+            patientProcedureRepository: DatabasePatientProcedureRepository,
           ) =>
             new UseCaseProxy(
               new addProcedureUseCases(
@@ -281,6 +283,7 @@ export class UsecasesProxyModule {
                 databaseProcedureRepository,
                 new EntityValidator(databaseDoctorRepository),
                 databaseDoctorRepository,
+                patientProcedureRepository,
               ),
             ),
         },

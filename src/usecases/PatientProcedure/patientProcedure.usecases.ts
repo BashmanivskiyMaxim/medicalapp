@@ -91,8 +91,93 @@ export class addPatientProcedureUseCases {
     );
   }
 
-  //async getById(id: string): Promise<PatientProcedureModel> {
-  //  const patientProcedure =
-  //    await this.patientProcedureRepository.getPatientProcedureById(+id);
-  //}
+  async getById(id: string, account: any) {
+    const patient = await this.patientRepository.getPatientByAccountId(
+      account.id,
+    );
+    const patientProcedure =
+      await this.patientProcedureRepository.getPatientProcedureById(+id);
+    if (!patientProcedure) {
+      throw new ForbiddenException('Patient procedure not found');
+    }
+    if (patient.id !== patientProcedure.patientId) {
+      throw new ForbiddenException('Permission denied');
+    }
+    this.logger.log(
+      'getPatientProcedureUseCases execute',
+      'Patient procedure have been found',
+    );
+
+    return patientProcedure;
+  }
+
+  async dailyScheduleProcedure() {
+    try {
+      const appointmentTime = [
+        '9:00',
+        '10:00',
+        '11:00',
+        '12:00',
+        '13:00',
+        '15:00',
+        '16:00',
+        '17:00',
+      ];
+      const procedures = await this.procedureRepository.getProcedures();
+      const appointmentsPerProcedure = 8;
+      for (const procedure of await procedures) {
+        for (let i = 0; i < appointmentsPerProcedure; i++) {
+          const patientProcedure = new PatientProcedureModel();
+          patientProcedure.doctorId = procedure.doctorId;
+          patientProcedure.patientId = 21;
+          patientProcedure.procedureId = procedure.id;
+          patientProcedure.procedureDate = new Date();
+          patientProcedure.createdDate = new Date();
+          patientProcedure.updatedDate = new Date();
+          patientProcedure.appointmentTime = appointmentTime[i];
+          patientProcedure.report = { report: 'report' };
+          patientProcedure.rating = 0;
+          this.patientProcedureRepository.createPatientProcedure(
+            patientProcedure,
+          );
+        }
+      }
+      this.logger.log(
+        'DailyProceduresSchedulerStrategy',
+        'Procedures scheduled',
+      );
+    } catch (error) {}
+  }
+  async getAll(account: any) {
+    this.ensureIsAdmin(account.accountType);
+    const patientProcedures =
+      await this.patientProcedureRepository.getAllProcedures();
+    this.logger.log(
+      'getPatientProceduresUseCases execute',
+      'All patient procedures have been fetched',
+    );
+    return patientProcedures;
+  }
+
+  async getMyProcedures(account: any) {
+    const patient = await this.patientRepository.getPatientByAccountId(
+      account.id,
+    );
+    if (!patient) {
+      throw new ForbiddenException('Patient not found');
+    }
+    const patientProcedures =
+      await this.patientProcedureRepository.getPatientProcedures(patient.id);
+    if (!patientProcedures.length) {
+      throw new ForbiddenException('Patient procedures not found');
+    }
+    if (patient.id !== patientProcedures[0].patientId) {
+      throw new ForbiddenException('Permission denied');
+    }
+    this.logger.log(
+      'getMyProceduresUseCases execute',
+      'All patient procedures have been fetched',
+    );
+    return patientProcedures;
+  }
 }

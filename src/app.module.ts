@@ -10,6 +10,8 @@ import { JwtModule as JwtServiceModule } from './infrastructure/services/jwt/jwt
 import { LocalStrategy } from './infrastructure/common/strategies/local.strategy';
 import { JwtStrategy } from './infrastructure/common/strategies/jwt.strategies';
 import { JwtRefreshTokenStrategy } from './infrastructure/common/strategies/jwtRefresh.strategy';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DailyProceduresSchedulerStrategy } from './infrastructure/common/strategies/dailyProceduresScheduler.strategy';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { JwtRefreshTokenStrategy } from './infrastructure/common/strategies/jwtR
     JwtModule.register({
       secret: process.env.secret,
     }),
+    ScheduleModule.forRoot(),
     LoggerModule,
     ExceptionsModule,
     UsecasesProxyModule.regiter(),
@@ -25,6 +28,11 @@ import { JwtRefreshTokenStrategy } from './infrastructure/common/strategies/jwtR
     JwtModule,
     JwtServiceModule,
   ],
-  providers: [LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy],
+  providers: [
+    DailyProceduresSchedulerStrategy,
+    LocalStrategy,
+    JwtStrategy,
+    JwtRefreshTokenStrategy,
+  ],
 })
 export class AppModule {}

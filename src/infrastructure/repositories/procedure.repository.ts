@@ -38,8 +38,8 @@ export class DatabaseProcedureRepository
       where: { id: procedureId },
     });
   }
-  getProcedures(): Promise<any> {
-    return this.procedureEntityRepository.find();
+  async getProcedures(): Promise<any> {
+    return await this.procedureEntityRepository.find();
   }
 
   async getProcedureByDoctorId(doctorId: number): Promise<any> {

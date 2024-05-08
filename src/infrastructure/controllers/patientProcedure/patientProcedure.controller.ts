@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Inject,
   Param,
   Patch,
@@ -78,25 +79,37 @@ export class PatientProcedureController {
     return 'Procedure deleted successfully';
   }
 
-  //   @Get('get/:id')
-  //   @UseGuards(JwtAuthGuard)
-  //   @ApiOperation({ description: 'get' })
-  //   async getPatientProcedure(@Param('id') id: string) {
-  //     const patientProcedure = await this.addPatientProcedureUseCasesProxy
-  //       .getInstance()
-  //       .getById(id);
-  //     return new PatientProcedurePresenter(patientProcedure);
-  //   }
+  @Get('get/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getPatientProcedure(@Param('id') id: string, @Request() request: any) {
+    const patientProcedure = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getById(id, request.user);
+    return new PatientProcedurePresenter(patientProcedure);
+  }
 
-  //   @Get('get')
-  //   @UseGuards(JwtAuthGuard)
-  //   @ApiOperation({ description: 'get' })
-  //   async getPatientProcedures() {
-  //     const patientProcedures = await this.addPatientProcedureUseCasesProxy
-  //       .getInstance()
-  //       .getAll();
-  //     return patientProcedures.map(
-  //       (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
-  //     );
-  //   }
+  @Get('get')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getPatientProcedures(@Request() request: any) {
+    const patientProcedures = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getAll(request.user);
+    return patientProcedures.map(
+      (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
+    );
+  }
+
+  @Get('getMyProcedures')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getMyProcedures(@Request() request: any) {
+    const patientProcedures = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getMyProcedures(request.user);
+    return patientProcedures.map(
+      (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
+    );
+  }
 }

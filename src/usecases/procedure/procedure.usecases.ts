@@ -6,6 +6,7 @@ import {
 import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
 import { ProcedureRepository } from 'src/domain/repositories/procedure.repository';
 import { EntityValidator } from '../utils/checkExistense.usecases';
+import { PatientProcedureRepository } from 'src/domain/repositories/patientProcedure.repository';
 
 export class addProcedureUseCases {
   constructor(
@@ -13,6 +14,7 @@ export class addProcedureUseCases {
     private readonly procedureRepository: ProcedureRepository,
     private readonly EntityValidator: EntityValidator,
     private readonly doctorRepository: DoctorRepository,
+    private readonly patientProcedureRepository: PatientProcedureRepository,
   ) {}
 
   private ensureIsAdmin(accountType: string) {
@@ -112,19 +114,32 @@ export class addProcedureUseCases {
     return procedures;
   }
 
-  // async rate(id: string, accountAdmin: { accountType: string }) {
-  //   this.ensureIsAdmin(accountAdmin.accountType);
-  //   const procedure = await this.procedureRepository.getProcedureById(+id);
-  //   if (!procedure) {
-  //     throw new ForbiddenException('Procedure not found');
-  //   }
-  //   const rates = await this.patientProcedure
-  //   procedure.averageRating = rate;
-  //   const result = await this.procedureRepository.updateProcedure(+id, procedure);
-  //   this.logger.log(
-  //     'addProcedureUseCases execute',
-  //     'Procedure have been rated',
-  //   );
-  //   return result;
-  // }
+  async rate(id: string, accountAdmin: { accountType: string }) {
+    this.ensureIsAdmin(accountAdmin.accountType);
+    const procedure = await this.procedureRepository.getProcedureById(+id);
+    if (!procedure) {
+      throw new ForbiddenException('Procedure not found');
+    }
+    const procedures =
+      await this.patientProcedureRepository.getPatientProceduresByProcedureId(
+        +id,
+      );
+    if (!procedures) {
+      throw new ForbiddenException('Patient Procedures not found');
+    }
+    let rate = 0;
+    for (const proc of procedures) {
+      rate += proc.rating;
+    }
+    procedure.averageRating = Math.round(rate / procedures.length);
+    const result = await this.procedureRepository.updateProcedure(
+      +id,
+      procedure,
+    );
+    this.logger.log(
+      'addProcedureUseCases execute',
+      'Procedure have been rated',
+    );
+    return result;
+  }
 }

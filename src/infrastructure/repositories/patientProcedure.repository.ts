@@ -55,4 +55,22 @@ export class DatabasePatientProcedureRepository
       where: { patient: { id: patientId } },
     });
   }
+  getPatientProcedureById(patientProcedureId: number): Promise<any> {
+    return this.patientProcedureEntityRepository.findOne({
+      where: { id: patientProcedureId },
+    });
+  }
+  getAllProcedures(): Promise<any> {
+    return this.patientProcedureEntityRepository.find();
+  }
+  getPatientProceduresByProcedureId(procedureId: number): Promise<any> {
+    return this.patientProcedureEntityRepository.find({
+      where: { procedure: { id: procedureId } },
+    });
+  }
+  getPatientProceduresByDoctorId(doctorId: number): Promise<any> {
+    return this.patientProcedureEntityRepository.find({
+      where: { doctor: { id: doctorId } },
+    });
+  }
 }
