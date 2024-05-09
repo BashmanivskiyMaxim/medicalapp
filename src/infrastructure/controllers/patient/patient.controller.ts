@@ -61,4 +61,14 @@ export class PatientController {
       .getPatients(request.user);
     return patients;
   }
+
+  @Get('getMyPatientInfo')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'getMyPatientInfo' })
+  async getMyPatientInfo(@Req() request: any) {
+    const patients = await this.addPatientUseCasesProxy
+      .getInstance()
+      .getMyPatientInfo(request.user);
+    return patients;
+  }
 }

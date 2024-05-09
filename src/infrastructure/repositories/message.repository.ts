@@ -50,7 +50,6 @@ export class DatabaseMessageRepository
     });
   }
   async decryptMessage(encryptedMessage: any): Promise<any> {
-    console.log(encryptedMessage);
     const decryptedMessage = await this.messageEntityRepository.query(
       `SELECT pgp_sym_decrypt($1, $2) AS decrypted_message`,
       [encryptedMessage, process.env.ENCRYPTION_KEY],

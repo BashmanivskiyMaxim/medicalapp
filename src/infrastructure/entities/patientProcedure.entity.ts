@@ -35,8 +35,8 @@ export class PatientProcedureEntity {
   @Column({ name: 'appointment_time', type: 'time' })
   appointmentTime: string;
 
-  @Column({ type: 'json' })
-  report: object;
+  @Column({ name: 'report', type: 'bytea' })
+  report: Buffer;
 
   @Column()
   rating: number;

@@ -27,6 +27,6 @@ export class PatientEntity {
   @Column({ name: 'recovery_status', default: false })
   recovery_status: boolean;
 
-  @Column({ name: 'additional_info', type: 'json', default: '{}' })
-  additional_info: any;
+  @Column({ name: 'additional_info', type: 'bytea' })
+  additional_info: Buffer;
 }

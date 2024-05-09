@@ -11,12 +11,11 @@ export class PatientPresenter {
   @ApiProperty()
   recovery_status: boolean;
   @ApiProperty()
-  additional_info: object;
+  additional_info: object | string;
 
   constructor(patient: PatientModel) {
     this.id = patient.id;
     this.accountId = patient.accountId;
-    this.doctorId = patient.doctorId;
     this.recovery_status = patient.recovery_status;
     this.additional_info = patient.additional_info;
   }

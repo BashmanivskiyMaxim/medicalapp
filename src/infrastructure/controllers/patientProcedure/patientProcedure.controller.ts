@@ -112,4 +112,44 @@ export class PatientProcedureController {
       (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
     );
   }
+
+  @Get('getDoctorProcedures')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getDoctorProcedures(@Request() request: any) {
+    const patientProcedures = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getDoctorProcedures(request.user);
+    return patientProcedures.map(
+      (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
+    );
+  }
+
+  @Patch('rate/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'rate' })
+  async rateProcedure(
+    @Request() request: any,
+    @Param('id') id: string,
+    @Body() rating: number,
+  ) {
+    const patientProcedure = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .rateProcedure(id, rating, request.user);
+    return new PatientProcedurePresenter(patientProcedure);
+  }
+
+  @Patch('report/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'report' })
+  async reportProcedure(
+    @Request() request: any,
+    @Param('id') id: string,
+    @Body() report: object,
+  ) {
+    const patientProcedure = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .reportProcedure(id, report, request.user);
+    return new PatientProcedurePresenter(patientProcedure);
+  }
 }

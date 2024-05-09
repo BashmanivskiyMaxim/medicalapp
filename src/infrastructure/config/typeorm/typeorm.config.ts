@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 if (process.env.NODE_ENV === 'local') {
   dotenv.config({ path: './env/local.env' });
 }
-
+dotenv.config({ path: './env/local.env' });
 export const config = new DataSource({
   type: 'postgres',
   host: process.env.DATABASE_HOST,

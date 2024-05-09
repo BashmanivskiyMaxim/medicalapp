@@ -7,6 +7,6 @@ export class PatientProcedureModel {
   createdDate?: Date;
   updatedDate?: Date;
   appointmentTime?: string;
-  report?: object;
+  report?: object | string;
   rating?: number;
 }

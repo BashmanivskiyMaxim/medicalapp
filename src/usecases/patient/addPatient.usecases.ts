@@ -20,23 +20,18 @@ export class addPatientUseCases {
       );
     }
   }
-  private async ensureIsExistence(patientId: number, doctorId: number) {
-    const result = await this.patientRepository.getPatient(patientId, doctorId);
+  private async ensureIsExistence(patientId: number) {
+    const result = await this.patientRepository.getPatient(patientId);
     if (!result) {
       throw new ForbiddenException(
         'Permission denied. Patient does not exist.',
       );
     }
   }
-  async execute(data: PatientModel, accountDoctor: any): Promise<PatientModel> {
-    this.ensureIsDoctor(accountDoctor.accountType);
-    const doctor = await this.doctorRepository.findByAccountId(
-      +accountDoctor.id,
-    );
+  async execute(data: PatientModel, account: any): Promise<PatientModel> {
     const patient = new PatientModel();
-    patient.accountId = data.accountId;
-    patient.doctorId = doctor.id;
-    patient.recovery_status = data.recovery_status;
+    patient.accountId = account.id;
+    patient.recovery_status = false;
     patient.additional_info = data.additional_info;
     const result = await this.patientRepository.createPatient(patient);
     this.logger.log(
@@ -51,10 +46,7 @@ export class addPatientUseCases {
     patient_id: string,
   ): Promise<PatientModel> {
     this.ensureIsDoctor(accountDoctor.accountType);
-    const doctor = await this.doctorRepository.findByAccountId(
-      +accountDoctor.id,
-    );
-    await this.ensureIsExistence(+patient_id, +doctor.id);
+    await this.ensureIsExistence(+patient_id);
     const result = await this.patientRepository.deletePatient(+patient_id);
     this.logger.log(
       'deletePatientUseCases execute',
@@ -74,5 +66,15 @@ export class addPatientUseCases {
       'Patient have been retrieved',
     );
     return result;
+  }
+
+  async getMyPatientInfo(account: any): Promise<PatientModel> {
+    const patient = await this.patientRepository.getPatient(+account.id);
+    if (!patient) {
+      throw new ForbiddenException(
+        'Permission denied. Patient does not exist.',
+      );
+    }
+    return patient;
   }
 }

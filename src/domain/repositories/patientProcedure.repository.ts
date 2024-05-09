@@ -12,4 +12,5 @@ export interface PatientProcedureRepository {
   getPatientProcedureById(patientProcedureId: number): Promise<any>;
   getAllProcedures(): Promise<any>;
   getPatientProceduresByProcedureId(procedureId: number): Promise<any>;
+  getPatientProceduresByDoctorId(doctorId: number): Promise<any>;
 }

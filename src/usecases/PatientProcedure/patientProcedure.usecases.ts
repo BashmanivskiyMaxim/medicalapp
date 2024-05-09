@@ -180,4 +180,81 @@ export class addPatientProcedureUseCases {
     );
     return patientProcedures;
   }
+
+  async getDoctorProcedures(account: any) {
+    this.ensureIsDoctor(account.accountType);
+    const doctor = await this.doctorRepository.findByAccountId(account.id);
+    if (!doctor) {
+      throw new ForbiddenException('Doctor not found');
+    }
+    const doctorProcedures =
+      await this.patientProcedureRepository.getPatientProceduresByDoctorId(
+        doctor.id,
+      );
+    if (!doctorProcedures.length) {
+      throw new ForbiddenException('Doctor procedures not found');
+    }
+    if (doctor.id !== doctorProcedures[0].doctorId) {
+      throw new ForbiddenException('Permission denied');
+    }
+    this.logger.log(
+      'getDoctorProceduresUseCases execute',
+      'All doctor procedures have been fetched',
+    );
+    return doctorProcedures;
+  }
+
+  async rateProcedure(id: string, rating: number, account: any) {
+    const patientProcedure =
+      await this.patientProcedureRepository.getPatientProcedureById(+id);
+    if (!patientProcedure) {
+      throw new ForbiddenException('Patient procedure not found');
+    }
+    const patient = await this.patientRepository.getPatientByAccountId(
+      account.id,
+    );
+    if (!patient) {
+      throw new ForbiddenException('Patient not found');
+    }
+    if (patient.id !== patientProcedure.patientId) {
+      throw new ForbiddenException('Permission denied');
+    }
+    patientProcedure.rating = rating;
+    patientProcedure.updatedDate = new Date();
+    const result = await this.patientProcedureRepository.updatePatientProcedure(
+      +id,
+      patientProcedure,
+    );
+    this.logger.log(
+      'rateProcedureUseCases execute',
+      'Patient procedure have been rated',
+    );
+    return result;
+  }
+
+  async reportProcedure(id: string, report: object, account: any) {
+    const patientProcedure =
+      await this.patientProcedureRepository.getPatientProcedureById(+id);
+    if (!patientProcedure) {
+      throw new ForbiddenException('Patient procedure not found');
+    }
+    const doctor = await this.doctorRepository.findByAccountId(account.id);
+    if (!doctor) {
+      throw new ForbiddenException('Doctor not found');
+    }
+    if (doctor.id !== patientProcedure.doctorId) {
+      throw new ForbiddenException('Permission denied');
+    }
+    patientProcedure.report = report;
+    patientProcedure.updatedDate = new Date();
+    const result = await this.patientProcedureRepository.updatePatientProcedure(
+      +id,
+      patientProcedure,
+    );
+    this.logger.log(
+      'reportProcedureUseCases execute',
+      'Patient procedure have been reported',
+    );
+    return result;
+  }
 }
