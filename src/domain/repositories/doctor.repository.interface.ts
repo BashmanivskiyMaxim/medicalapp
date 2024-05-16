@@ -8,4 +8,5 @@ export interface DoctorRepository {
   getDoctors(): Promise<any>;
   findByAccountId(accountId: number): Promise<any>;
   findByUsername(username: string): Promise<any>;
+  getDoctorById(doctorId: number): Promise<any>;
 }

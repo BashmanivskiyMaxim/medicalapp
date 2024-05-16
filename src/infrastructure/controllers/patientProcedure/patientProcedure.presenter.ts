@@ -26,3 +26,12 @@ export class PatientProcedurePresenter {
     this.rating = patientProcedure.rating;
   }
 }
+
+export class PatientProcedureTimesPresenter {
+  @ApiProperty()
+  procedureDate: string;
+
+  constructor(procedureDate: string) {
+    this.procedureDate = procedureDate;
+  }
+}

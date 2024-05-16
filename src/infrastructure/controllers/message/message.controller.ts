@@ -8,6 +8,7 @@ import {
   Get,
   Delete,
   Param,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiExtraModels,
@@ -67,5 +68,17 @@ export class MessageController {
     await this.addMessageUseCasesProxy
       .getInstance()
       .deleteMessage(id, request.user);
+  }
+
+  @Patch('deleteForReceiver/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'delete message for receiver' })
+  async deleteMessageForReceiver(
+    @Request() request: any,
+    @Param('id') id: string,
+  ) {
+    await this.addMessageUseCasesProxy
+      .getInstance()
+      .deleteMessageForReceiver(id, request.user);
   }
 }

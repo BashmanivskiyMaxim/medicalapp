@@ -18,38 +18,43 @@ export class DatabaseDoctorRepository
   ) {
     super(doctorEntityRepository);
   }
-  createDoctor(doctor: DoctorModel): Promise<any> {
+  async createDoctor(doctor: DoctorModel): Promise<any> {
     const doctorEntity = this.doctorEntityRepository.create({
       account: { id: doctor.accountId },
       specialty: doctor.specialty,
       qualification: doctor.qualification,
     });
-    return this.doctorEntityRepository.save(doctorEntity);
+    return await this.doctorEntityRepository.save(doctorEntity);
   }
   async updateDoctor(id: number, doctor: DoctorModel): Promise<any> {
-    return this.doctorEntityRepository.save({
+    return await this.doctorEntityRepository.save({
       id: id,
       ...doctor,
     });
   }
-  deleteDoctor(doctorAccountId: number): Promise<any> {
-    return this.doctorEntityRepository.delete(doctorAccountId);
+  async deleteDoctor(doctorAccountId: number): Promise<any> {
+    return await this.doctorEntityRepository.delete(doctorAccountId);
   }
   async getDoctor(doctor: DoctorModel): Promise<any> {
     return await this.doctorEntityRepository.findOne({
       where: { id: doctor.id },
     });
   }
-  getDoctors(): Promise<any> {
-    return this.doctorEntityRepository.find();
+  async getDoctorById(doctorId: number): Promise<any> {
+    return await this.doctorEntityRepository.findOne({
+      where: { id: doctorId },
+    });
   }
-  findByAccountId(accountId: number): Promise<any> {
-    return this.doctorEntityRepository.findOne({
+  async getDoctors(): Promise<any> {
+    return await this.doctorEntityRepository.find();
+  }
+  async findByAccountId(accountId: number): Promise<any> {
+    return await this.doctorEntityRepository.findOne({
       where: { account: { id: accountId } },
     });
   }
-  findByUsername(username: string): Promise<any> {
-    return this.doctorEntityRepository.findOne({
+  async findByUsername(username: string): Promise<any> {
+    return await this.doctorEntityRepository.findOne({
       where: { account: { username: username } },
     });
   }

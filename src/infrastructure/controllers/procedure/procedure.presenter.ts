@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { DoctorModel } from 'src/domain/model/doctorModel';
 
 export class ProcedurePresenter {
   @ApiProperty()
-  doctorId: number;
+  doctor: DoctorModel;
   @ApiProperty()
   procedureName: string;
   @ApiProperty()
@@ -11,7 +12,7 @@ export class ProcedurePresenter {
   averageRating: number;
 
   constructor(procedure: any) {
-    this.doctorId = procedure.doctorId;
+    this.doctor = procedure.doctor;
     this.procedureName = procedure.procedureName;
     this.procedureDescription = procedure.procedureDescription;
     this.averageRating = procedure.averageRating;

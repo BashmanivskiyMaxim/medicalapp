@@ -2,6 +2,7 @@ import { ForbiddenException, Logger } from '@nestjs/common';
 import {
   ProcedureModel,
   ProcedureModelWithDoctor,
+  ProcedureModelWithDoctorUsername,
 } from 'src/domain/model/procedureModel';
 import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
 import { ProcedureRepository } from 'src/domain/repositories/procedure.repository';
@@ -34,7 +35,7 @@ export class addProcedureUseCases {
   }
 
   async add(
-    data: ProcedureModelWithDoctor,
+    data: ProcedureModelWithDoctorUsername,
     accountAdmin: { accountType: string },
   ): Promise<ProcedureModel> {
     this.ensureIsAdmin(accountAdmin.accountType);
@@ -58,7 +59,7 @@ export class addProcedureUseCases {
   }
 
   async update(
-    data: ProcedureModelWithDoctor,
+    data: ProcedureModelWithDoctorUsername,
     accountAdmin: { accountType: string },
     id: string,
   ): Promise<ProcedureModel> {
@@ -107,11 +108,44 @@ export class addProcedureUseCases {
 
   async getAll() {
     const procedures = await this.procedureRepository.getProcedures();
+    if (!procedures) {
+      throw new ForbiddenException('Procedures not found');
+    }
+    for (const proc of procedures) {
+      const doctor = await this.doctorRepository.getDoctorById(proc.doctorId);
+      if (!doctor) {
+        throw new ForbiddenException('Doctor not found');
+      }
+      proc.doctor = doctor;
+    }
     this.logger.log(
       'addProcedureUseCases execute',
       'All procedures have been fetched',
     );
     return procedures;
+  }
+
+  async getProceduresWithDoctor(procedures: ProcedureModel[]) {
+    const proceduresWithDoctor: ProcedureModelWithDoctor[] = [];
+    for (const proc of procedures) {
+      const doctor = await this.doctorRepository.getDoctorById(proc.doctorId);
+      if (!doctor) {
+        throw new ForbiddenException('Doctor not found');
+      }
+      const procedureWithDoctor: ProcedureModelWithDoctor = {
+        id: proc.id,
+        procedureName: proc.procedureName,
+        procedureDescription: proc.procedureDescription,
+        averageRating: proc.averageRating,
+        doctor: doctor,
+      };
+      proceduresWithDoctor.push(procedureWithDoctor);
+    }
+    this.logger.log(
+      'addProcedureUseCases execute',
+      'All procedures have been fetched',
+    );
+    return proceduresWithDoctor;
   }
 
   async rate(id: string, accountAdmin: { accountType: string }) {

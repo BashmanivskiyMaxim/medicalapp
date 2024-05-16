@@ -92,7 +92,12 @@ export class ProcedureController {
     const procedures = await this.addProcedureUseCasesProxy
       .getInstance()
       .getAll();
-    return procedures.map((procedure) => new ProcedurePresenter(procedure));
+    const proceduresWithDoctor = await this.addProcedureUseCasesProxy
+      .getInstance()
+      .getProceduresWithDoctor(procedures);
+    return proceduresWithDoctor.map(
+      (proceduresWithDoctor) => new ProcedurePresenter(proceduresWithDoctor),
+    );
   }
 
   @Patch('rate/:id')

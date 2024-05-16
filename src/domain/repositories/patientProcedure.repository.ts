@@ -13,4 +13,8 @@ export interface PatientProcedureRepository {
   getAllProcedures(): Promise<any>;
   getPatientProceduresByProcedureId(procedureId: number): Promise<any>;
   getPatientProceduresByDoctorId(doctorId: number): Promise<any>;
+  getPatientProceduresTimesTodayById(
+    date: Date,
+    patientId: number,
+  ): Promise<any>;
 }

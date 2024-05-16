@@ -129,7 +129,7 @@ export class addPatientProcedureUseCases {
         for (let i = 0; i < appointmentsPerProcedure; i++) {
           const patientProcedure = new PatientProcedureModel();
           patientProcedure.doctorId = procedure.doctorId;
-          patientProcedure.patientId = 21;
+          patientProcedure.patientId = 28;
           patientProcedure.procedureId = procedure.id;
           patientProcedure.procedureDate = new Date();
           patientProcedure.createdDate = new Date();
@@ -146,7 +146,12 @@ export class addPatientProcedureUseCases {
         'DailyProceduresSchedulerStrategy',
         'Procedures scheduled',
       );
-    } catch (error) {}
+    } catch (error) {
+      this.logger.error(
+        'DailyProceduresSchedulerStrategy',
+        'Error scheduling procedures',
+      );
+    }
   }
   async getAll(account: any) {
     this.ensureIsAdmin(account.accountType);
@@ -256,5 +261,21 @@ export class addPatientProcedureUseCases {
       'Patient procedure have been reported',
     );
     return result;
+  }
+
+  async getTodayProceduresTimes(id: string) {
+    const patientProcedures =
+      await this.patientProcedureRepository.getPatientProceduresTimesTodayById(
+        new Date(),
+        +id,
+      );
+    if (!patientProcedures.length) {
+      throw new ForbiddenException('Procedures not found');
+    }
+    this.logger.log(
+      'getTodayProceduresUseCases execute',
+      'Today procedures times have been fetched',
+    );
+    return patientProcedures;
   }
 }

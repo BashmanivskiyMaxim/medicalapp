@@ -58,4 +58,18 @@ export class addMessageUseCases {
       'Message have been deleted',
     );
   }
+  async deleteMessageForReceiver(
+    messageId: string,
+    account: any,
+  ): Promise<void> {
+    const message = await this.messageRepository.getMessage(+messageId);
+    if (account.id !== message.receiver.id) {
+      throw new Error('You are not the receiver of this message');
+    }
+    await this.messageRepository.deleteMessageForReceiver(+message.id);
+    this.logger.log(
+      'deleteMessageForReceiverUseCases execute',
+      'Message have been deleted',
+    );
+  }
 }

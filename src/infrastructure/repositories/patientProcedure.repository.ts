@@ -123,4 +123,19 @@ export class DatabasePatientProcedureRepository
     }
     return patientProcedures;
   }
+  async getPatientProceduresTimesTodayById(
+    date: Date,
+    procedureId: number,
+  ): Promise<Date[]> {
+    const patientProcedures = await this.patientProcedureEntityRepository.find({
+      where: { procedure: { id: procedureId } },
+    });
+    const todayDate = date.toISOString().split('T')[0];
+    return patientProcedures
+      .filter((patientProcedure) => {
+        const procedureDate = new Date(patientProcedure.procedureDate);
+        return procedureDate.toISOString().split('T')[0] === todayDate;
+      })
+      .map((patientProcedure) => new Date(patientProcedure.procedureDate));
+  }
 }

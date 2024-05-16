@@ -19,7 +19,10 @@ import {
 } from '@nestjs/swagger';
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
-import { PatientProcedurePresenter } from './patientProcedure.presenter';
+import {
+  PatientProcedurePresenter,
+  PatientProcedureTimesPresenter,
+} from './patientProcedure.presenter';
 import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 import { addPatientProcedureUseCases } from 'src/usecases/PatientProcedure/patientProcedure.usecases';
 import { AddPatientProcedureDto } from './patientProcedure.dto';
@@ -151,5 +154,18 @@ export class PatientProcedureController {
       .getInstance()
       .reportProcedure(id, report, request.user);
     return new PatientProcedurePresenter(patientProcedure);
+  }
+
+  @Get('todayProcedures/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getTodayProcedures(@Param('id') id: string) {
+    const patientProcedures = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getTodayProceduresTimes(id);
+    return patientProcedures.map(
+      (patientProcedure) =>
+        new PatientProcedureTimesPresenter(patientProcedure),
+    );
   }
 }

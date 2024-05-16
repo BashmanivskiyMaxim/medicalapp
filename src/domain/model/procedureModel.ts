@@ -1,3 +1,5 @@
+import { DoctorModel } from './doctorModel';
+
 export class ProcedureModel {
   id?: number;
   doctorId?: number;
@@ -6,6 +8,10 @@ export class ProcedureModel {
   averageRating?: number;
 }
 
+export class ProcedureModelWithDoctorUsername extends ProcedureModel {
+  doctorUsername: string;
+}
+
 export class ProcedureModelWithDoctor extends ProcedureModel {
-  doctorUsername?: string;
+  doctor: DoctorModel;
 }

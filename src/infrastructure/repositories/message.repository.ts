@@ -68,4 +68,9 @@ export class DatabaseMessageRepository
     }
     return messages;
   }
+  async deleteMessageForReceiver(messageId: number): Promise<any> {
+    return this.messageEntityRepository.update(messageId, {
+      receiver: null,
+    });
+  }
 }
