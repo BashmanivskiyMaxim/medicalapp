@@ -27,11 +27,28 @@ export class PatientProcedurePresenter {
   }
 }
 
+export class PatientProcedurePickPresenter {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  procedureName: string;
+  @ApiProperty()
+  patientId: number;
+
+  constructor(patientProcedure: any) {
+    this.id = patientProcedure.id;
+    this.procedureName = patientProcedure.procedureName;
+    this.patientId = patientProcedure.patientId;
+  }
+}
+
 export class PatientProcedureTimesPresenter {
   @ApiProperty()
-  procedureDate: string;
+  id: number;
+  @ApiProperty()
+  procedureTime: string;
 
-  constructor(procedureDate: string) {
-    this.procedureDate = procedureDate;
+  constructor(procedureTime: string) {
+    this.procedureTime = procedureTime;
   }
 }

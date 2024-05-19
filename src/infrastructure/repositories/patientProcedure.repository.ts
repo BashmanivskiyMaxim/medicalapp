@@ -65,10 +65,7 @@ export class DatabasePatientProcedureRepository
       process.env.ENCRYPTION_KEY,
     );
     patientProcedure.report = encryptedReport;
-    return this.patientProcedureEntityRepository.save({
-      id: id,
-      ...patientProcedure,
-    });
+    return this.patientProcedureEntityRepository.update(id, patientProcedure);
   }
   async deletePatientProcedure(patientProcedureId: number): Promise<any> {
     return await this.patientProcedureEntityRepository.delete(
@@ -126,16 +123,44 @@ export class DatabasePatientProcedureRepository
   async getPatientProceduresTimesTodayById(
     date: Date,
     procedureId: number,
-  ): Promise<Date[]> {
-    const patientProcedures = await this.patientProcedureEntityRepository.find({
-      where: { procedure: { id: procedureId } },
-    });
+  ): Promise<any> {
     const todayDate = date.toISOString().split('T')[0];
-    return patientProcedures
-      .filter((patientProcedure) => {
-        const procedureDate = new Date(patientProcedure.procedureDate);
-        return procedureDate.toISOString().split('T')[0] === todayDate;
+
+    const patientProcedures = await this.patientProcedureEntityRepository
+      .createQueryBuilder('patientProcedure')
+      .where('patientProcedure.procedureId = :procedureId', { procedureId })
+      .andWhere('patientProcedure.patientId = :patientId', { patientId: 28 })
+      .andWhere('DATE(patientProcedure.procedureDate) = DATE(:todayDate)', {
+        todayDate,
       })
-      .map((patientProcedure) => new Date(patientProcedure.procedureDate));
+      .getMany();
+
+    return patientProcedures.map((patientProcedure) => ({
+      id: patientProcedure.id,
+      appointmentTime: patientProcedure.appointmentTime,
+    }));
+  }
+  async getExistenseProcTodayByPatientId(
+    patientId: number,
+    patientProcedureId: number,
+  ): Promise<any> {
+    const todayDate = new Date().toISOString().split('T')[0];
+    const patientProcedure =
+      await this.patientProcedureEntityRepository.findOne({
+        where: {
+          id: patientProcedureId,
+        },
+      });
+    const patientProcedures = await this.patientProcedureEntityRepository
+      .createQueryBuilder('patientProcedure')
+      .where('patientProcedure.patientId = :patientId', { patientId })
+      .andWhere('DATE(patientProcedure.procedureDate) = DATE(:todayDate)', {
+        todayDate,
+      })
+      .andWhere('patientProcedure.procedureId = :procedureId', {
+        procedureId: patientProcedure.procedureId,
+      })
+      .getOne();
+    return patientProcedures;
   }
 }

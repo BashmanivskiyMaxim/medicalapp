@@ -29,9 +29,17 @@ export class addPatientProcedureUseCases {
     }
   }
 
+  private ensureIsPatient(accountType: string) {
+    if (accountType !== 'user') {
+      throw new ForbiddenException(
+        'Permission denied. Only user can execute this operation.',
+      );
+    }
+  }
+
   async add(
     data: PatientProcedureModel,
-    account,
+    account: any,
   ): Promise<PatientProcedureModel> {
     this.ensureIsAdmin(account.accountType);
     const procedure = await this.procedureRepository.getDoctorByProcedureId(
@@ -61,24 +69,49 @@ export class addPatientProcedureUseCases {
     return result;
   }
 
-  async update(account, id: string): Promise<PatientProcedureModel> {
+  async update(account: any, id: string): Promise<PatientProcedureModel> {
+    this.ensureIsPatient(account.accountType);
+
     const patient = await this.patientRepository.getPatientByAccountId(
       account.id,
     );
     if (!patient) {
       throw new ForbiddenException('Patient not found');
     }
+
+    const existingProcedure =
+      await this.patientProcedureRepository.getExistenseProcTodayByPatientId(
+        patient.id,
+        +id,
+      );
+
     const patientProcedure = new PatientProcedureModel();
     patientProcedure.patientId = patient.id;
     patientProcedure.updatedDate = new Date();
+    patientProcedure.report = { report: 'report' };
+
     const result = await this.patientProcedureRepository.updatePatientProcedure(
       +id,
       patientProcedure,
     );
+
+    if (existingProcedure) {
+      existingProcedure.updatedDate = new Date();
+      existingProcedure.patientId = 28;
+      existingProcedure.report = { report: 'report' };
+      existingProcedure.rating = 0;
+
+      await this.patientProcedureRepository.updatePatientProcedure(
+        existingProcedure.id,
+        existingProcedure,
+      );
+    }
+
     this.logger.log(
       'updatePatientProcedureUseCases execute',
-      'Patient procedure have been updated',
+      'Patient procedure has been updated',
     );
+
     return result;
   }
 
@@ -272,10 +305,14 @@ export class addPatientProcedureUseCases {
     if (!patientProcedures.length) {
       throw new ForbiddenException('Procedures not found');
     }
+    const timesWithoutSeconds = patientProcedures.map((procedure) => ({
+      id: procedure.id,
+      appointmentTime: procedure.appointmentTime.slice(0, -3),
+    }));
     this.logger.log(
       'getTodayProceduresUseCases execute',
       'Today procedures times have been fetched',
     );
-    return patientProcedures;
+    return timesWithoutSeconds;
   }
 }

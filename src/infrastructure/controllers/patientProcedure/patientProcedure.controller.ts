@@ -20,6 +20,7 @@ import {
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
 import {
+  PatientProcedurePickPresenter,
   PatientProcedurePresenter,
   PatientProcedureTimesPresenter,
 } from './patientProcedure.presenter';
@@ -66,7 +67,7 @@ export class PatientProcedureController {
     const patientProcedureUpdated = await this.addPatientProcedureUseCasesProxy
       .getInstance()
       .update(request.user, id);
-    return new PatientProcedurePresenter(patientProcedureUpdated);
+    return new PatientProcedurePickPresenter(patientProcedureUpdated);
   }
 
   @Delete('delete/:id')

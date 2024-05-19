@@ -17,4 +17,8 @@ export interface PatientProcedureRepository {
     date: Date,
     patientId: number,
   ): Promise<any>;
+  getExistenseProcTodayByPatientId(
+    patientId: number,
+    procedureId: number,
+  ): Promise<any>;
 }
