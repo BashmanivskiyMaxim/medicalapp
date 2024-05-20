@@ -1,5 +1,5 @@
 import { PatientProcedureRepository } from 'src/domain/repositories/patientProcedure.repository';
-import { ForbiddenException, Logger } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Logger } from '@nestjs/common';
 import { ProcedureRepository } from 'src/domain/repositories/procedure.repository';
 import { PatientProcedureModel } from 'src/domain/model/patientProcedureModel';
 import { DoctorRepository } from 'src/domain/repositories/doctor.repository.interface';
@@ -90,29 +90,39 @@ export class addPatientProcedureUseCases {
     patientProcedure.updatedDate = new Date();
     patientProcedure.report = { report: 'report' };
 
-    const result = await this.patientProcedureRepository.updatePatientProcedure(
-      +id,
-      patientProcedure,
-    );
+    try {
+      const result =
+        await this.patientProcedureRepository.updatePatientProcedure(
+          +id,
+          patientProcedure,
+        );
 
-    if (existingProcedure) {
-      existingProcedure.updatedDate = new Date();
-      existingProcedure.patientId = 28;
-      existingProcedure.report = { report: 'report' };
-      existingProcedure.rating = 0;
+      if (existingProcedure) {
+        existingProcedure.updatedDate = new Date();
+        existingProcedure.patientId = 28;
+        existingProcedure.report = { report: 'report' };
+        existingProcedure.rating = 0;
 
-      await this.patientProcedureRepository.updatePatientProcedure(
-        existingProcedure.id,
-        existingProcedure,
+        await this.patientProcedureRepository.updatePatientProcedure(
+          existingProcedure.id,
+          existingProcedure,
+        );
+      }
+
+      this.logger.log(
+        'updatePatientProcedureUseCases execute',
+        'Patient procedure has been updated',
       );
+
+      return result;
+    } catch (error) {
+      if ((error.code = '23505')) {
+        throw new ConflictException(
+          'Неможливо записатися на дві різні процедури одночасно',
+        );
+      }
+      throw error;
     }
-
-    this.logger.log(
-      'updatePatientProcedureUseCases execute',
-      'Patient procedure has been updated',
-    );
-
-    return result;
   }
 
   async delete(id: string, account: { accountType: string }) {

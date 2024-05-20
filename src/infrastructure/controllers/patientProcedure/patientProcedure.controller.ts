@@ -20,13 +20,14 @@ import {
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
 import {
+  PatientProcedureForPatientPresenter,
   PatientProcedurePickPresenter,
   PatientProcedurePresenter,
   PatientProcedureTimesPresenter,
 } from './patientProcedure.presenter';
 import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 import { addPatientProcedureUseCases } from 'src/usecases/PatientProcedure/patientProcedure.usecases';
-import { AddPatientProcedureDto } from './patientProcedure.dto';
+import { AddPatientProcedureDto, RatingDto } from './patientProcedure.dto';
 
 @Controller('patientProcedure')
 @ApiTags('patientProcedure')
@@ -113,7 +114,8 @@ export class PatientProcedureController {
       .getInstance()
       .getMyProcedures(request.user);
     return patientProcedures.map(
-      (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
+      (patientProcedure) =>
+        new PatientProcedureForPatientPresenter(patientProcedure),
     );
   }
 
@@ -135,11 +137,11 @@ export class PatientProcedureController {
   async rateProcedure(
     @Request() request: any,
     @Param('id') id: string,
-    @Body() rating: number,
+    @Body() rating: RatingDto,
   ) {
     const patientProcedure = await this.addPatientProcedureUseCasesProxy
       .getInstance()
-      .rateProcedure(id, rating, request.user);
+      .rateProcedure(id, rating.rating, request.user);
     return new PatientProcedurePresenter(patientProcedure);
   }
 

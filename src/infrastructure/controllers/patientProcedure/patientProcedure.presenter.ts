@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { DoctorModel } from 'src/domain/model/doctorModel';
+import { ProcedureModel } from 'src/domain/model/procedureModel';
 
 export class PatientProcedurePresenter {
   @ApiProperty()
@@ -50,5 +52,32 @@ export class PatientProcedureTimesPresenter {
 
   constructor(procedureTime: string) {
     this.procedureTime = procedureTime;
+  }
+}
+
+export class PatientProcedureForPatientPresenter {
+  @ApiProperty()
+  doctor: DoctorModel;
+  @ApiProperty()
+  procedureDate: string;
+  @ApiProperty()
+  updatedDate: string;
+  @ApiProperty()
+  appointmentTime: string;
+  @ApiProperty()
+  report: object;
+  @ApiProperty()
+  rating: number;
+  @ApiProperty()
+  procedure: ProcedureModel;
+
+  constructor(patientProcedure: any) {
+    this.doctor = patientProcedure.doctor;
+    this.procedureDate = patientProcedure.procedureDate;
+    this.updatedDate = patientProcedure.updatedDate;
+    this.appointmentTime = patientProcedure.appointmentTime;
+    this.report = patientProcedure.report;
+    this.rating = patientProcedure.rating;
+    this.procedure = patientProcedure.procedure;
   }
 }

@@ -106,45 +106,60 @@ export class addProcedureUseCases {
     return procedure;
   }
 
-  async getAll() {
-    const procedures = await this.procedureRepository.getProcedures();
+  async getAll(): Promise<ProcedureModel[]> {
+    const procedures = await this.procedureRepository.findForAll({
+      relations: ['doctor'],
+    });
+
     if (!procedures) {
       throw new ForbiddenException('Procedures not found');
     }
-    for (const proc of procedures) {
-      const doctor = await this.doctorRepository.getDoctorById(proc.doctorId);
-      if (!doctor) {
-        throw new ForbiddenException('Doctor not found');
-      }
-      proc.doctor = doctor;
-    }
+
     this.logger.log(
       'addProcedureUseCases execute',
       'All procedures have been fetched',
     );
+
     return procedures;
   }
 
-  async getProceduresWithDoctor(procedures: ProcedureModel[]) {
-    const proceduresWithDoctor: ProcedureModelWithDoctor[] = [];
-    for (const proc of procedures) {
-      const doctor = await this.doctorRepository.getDoctorById(proc.doctorId);
-      if (!doctor) {
-        throw new ForbiddenException('Doctor not found');
-      }
-      const procedureWithDoctor: ProcedureModelWithDoctor = {
-        id: proc.id,
-        procedureName: proc.procedureName,
-        procedureDescription: proc.procedureDescription,
-        averageRating: proc.averageRating,
-        doctor: doctor,
-      };
-      proceduresWithDoctor.push(procedureWithDoctor);
+  async getProceduresWithDoctor(
+    procedures: any,
+  ): Promise<ProcedureModelWithDoctor[]> {
+    const doctorIds = procedures.map((proc) => proc.doctor?.id).filter(Boolean);
+
+    const doctors = await this.doctorRepository.getDoctorsByIds(doctorIds);
+
+    if (!doctors || doctors.length === 0) {
+      throw new ForbiddenException('Doctors not found');
     }
+
+    const doctorMap = new Map(doctors.map((doc) => [doc.id, doc]));
+
+    const proceduresWithDoctor: ProcedureModelWithDoctor[] = procedures.map(
+      (proc) => {
+        const doctor = doctorMap.get(proc.doctor.id);
+        if (!doctor) {
+          throw new ForbiddenException(
+            `Doctor with ID ${proc.doctor.id} not found`,
+          );
+        }
+
+        return {
+          id: proc.id,
+          procedureName: proc.procedureName,
+          procedureDescription: proc.procedureDescription,
+          averageRating: proc.averageRating,
+          doctor: doctor,
+        };
+      },
+    );
+
     this.logger.log(
       'addProcedureUseCases execute',
-      'All procedures have been fetched',
+      'All procedures with doctors have been fetched',
     );
+
     return proceduresWithDoctor;
   }
 

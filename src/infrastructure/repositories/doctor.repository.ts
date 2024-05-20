@@ -58,4 +58,7 @@ export class DatabaseDoctorRepository
       where: { account: { username: username } },
     });
   }
+  async getDoctorsByIds(ids: number[]): Promise<DoctorModel[]> {
+    return this.doctorEntityRepository.findByIds(ids);
+  }
 }

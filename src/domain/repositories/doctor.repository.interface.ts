@@ -9,4 +9,5 @@ export interface DoctorRepository {
   findByAccountId(accountId: number): Promise<any>;
   findByUsername(username: string): Promise<any>;
   getDoctorById(doctorId: number): Promise<any>;
+  getDoctorsByIds(ids: number[]): Promise<DoctorModel[]>;
 }

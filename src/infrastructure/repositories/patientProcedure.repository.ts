@@ -78,9 +78,24 @@ export class DatabasePatientProcedureRepository
     });
   }
   async getPatientProcedures(patientId: number): Promise<any> {
-    const patientProcedures = await this.patientProcedureEntityRepository.find({
-      where: { patient: { id: patientId } },
-    });
+    const patientProcedures = await this.patientProcedureEntityRepository
+      .createQueryBuilder('patientProcedure')
+      .leftJoinAndSelect('patientProcedure.doctor', 'doctor')
+      .leftJoinAndSelect('doctor.account', 'account')
+      .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
+      .where('patientProcedure.patientId = :patientId', { patientId })
+      .select([
+        'patientProcedure',
+        'doctor.specialty',
+        'doctor.qualification',
+        'account.email',
+        'account.firstName',
+        'account.lastName',
+        'procedure.id',
+        'procedure.procedureName',
+        'procedure.procedureDescription',
+      ])
+      .getMany();
     for (const patientProcedure of patientProcedures) {
       patientProcedure.report = await this.decryptReport(
         patientProcedure.report,

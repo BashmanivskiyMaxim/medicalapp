@@ -39,3 +39,12 @@ export class UpdatePatientProcedureDto {
   @Max(5)
   readonly rating: number;
 }
+
+export class RatingDto {
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  readonly rating: number;
+}

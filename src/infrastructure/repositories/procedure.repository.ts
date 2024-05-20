@@ -1,4 +1,7 @@
-import { ProcedureModel } from 'src/domain/model/procedureModel';
+import {
+  ProcedureModel,
+  ProcedureModelWithDoctor,
+} from 'src/domain/model/procedureModel';
 import { ProcedureEntity } from '../entities/procedure.entity';
 import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -65,5 +68,31 @@ export class DatabaseProcedureRepository
       where: { id: procedureId },
       relations: ['doctor'],
     });
+  }
+
+  async getProceduresWithDoctors(): Promise<ProcedureModelWithDoctor[]> {
+    const query = `
+      SELECT p.id, p.procedure_name, p.procedure_description, p.average_rating, 
+             d.id AS doctor_id, d.specialty, d.qualification, d.account_id
+      FROM public.procedure p
+      JOIN public.doctor d ON p.doctor_id = d.id
+    `;
+
+    const result = await this.procedureEntityRepository.query(query);
+
+    return result.map((row) => ({
+      id: row.id,
+      procedureName: row.procedure_name,
+      procedureDescription: row.procedure_description,
+      averageRating: row.average_rating,
+      doctor: {
+        id: row.doctor_id,
+        name: row.doctor_name,
+        specialization: row.specialization,
+      },
+    }));
+  }
+  async findForAll(options: any): Promise<any> {
+    return await this.procedureEntityRepository.find(options);
   }
 }
