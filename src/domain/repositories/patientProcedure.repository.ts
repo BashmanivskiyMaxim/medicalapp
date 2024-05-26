@@ -13,12 +13,20 @@ export interface PatientProcedureRepository {
   getAllProcedures(): Promise<any>;
   getPatientProceduresByProcedureId(procedureId: number): Promise<any>;
   getPatientProceduresByDoctorId(doctorId: number): Promise<any>;
-  getPatientProceduresTimesTodayById(
-    date: Date,
-    patientId: number,
-  ): Promise<any>;
   getExistenseProcTodayByPatientId(
     patientId: number,
     procedureId: number,
   ): Promise<any>;
+  getPatientProceduresTimesByDate(
+    date: string,
+    procedureId: number,
+  ): Promise<any>;
+  deleteSchedule(startOfDay: Date, endOfDay: Date): Promise<void>;
+  getExistenseProcedure(
+    procedure: any,
+    procedureDate: Date,
+    appointmentTime: string,
+  ): Promise<any>;
+  getAvailableProceduresByDay(today: string): Promise<any>;
+  getUserPreferences(patientId: number): Promise<any>;
 }

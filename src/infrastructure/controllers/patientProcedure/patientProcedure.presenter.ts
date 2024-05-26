@@ -48,14 +48,20 @@ export class PatientProcedureTimesPresenter {
   @ApiProperty()
   id: number;
   @ApiProperty()
-  procedureTime: string;
+  appointmentTime: string;
+  @ApiProperty()
+  appointmentDate: string;
 
-  constructor(procedureTime: string) {
-    this.procedureTime = procedureTime;
+  constructor(patientProcedure: any) {
+    this.id = patientProcedure.id;
+    this.appointmentTime = patientProcedure.appointmentTime;
+    this.appointmentDate = patientProcedure.appointmentDate;
   }
 }
 
 export class PatientProcedureForPatientPresenter {
+  @ApiProperty()
+  id: string;
   @ApiProperty()
   doctor: DoctorModel;
   @ApiProperty()
@@ -72,6 +78,7 @@ export class PatientProcedureForPatientPresenter {
   procedure: ProcedureModel;
 
   constructor(patientProcedure: any) {
+    this.id = patientProcedure.id;
     this.doctor = patientProcedure.doctor;
     this.procedureDate = patientProcedure.procedureDate;
     this.updatedDate = patientProcedure.updatedDate;

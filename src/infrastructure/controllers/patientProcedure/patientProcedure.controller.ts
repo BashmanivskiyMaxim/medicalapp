@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -113,6 +115,7 @@ export class PatientProcedureController {
     const patientProcedures = await this.addPatientProcedureUseCasesProxy
       .getInstance()
       .getMyProcedures(request.user);
+
     return patientProcedures.map(
       (patientProcedure) =>
         new PatientProcedureForPatientPresenter(patientProcedure),
@@ -162,13 +165,40 @@ export class PatientProcedureController {
   @Get('todayProcedures/:id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'get' })
-  async getTodayProcedures(@Param('id') id: string) {
+  async getProceduresByDate(
+    @Param('id') id: string,
+    @Query('date') date: string,
+  ) {
+    if (!date) {
+      throw new BadRequestException('Date query parameter is required');
+    }
+
     const patientProcedures = await this.addPatientProcedureUseCasesProxy
       .getInstance()
-      .getTodayProceduresTimes(id);
+      .getProceduresByDate(+id, date);
     return patientProcedures.map(
       (patientProcedure) =>
         new PatientProcedureTimesPresenter(patientProcedure),
     );
+  }
+
+  @Patch('cancel/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'cancel' })
+  async cancelProcedure(@Request() request: any, @Param('id') id: string) {
+    await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .cancelProcedure(id, request.user);
+    return 'Procedure canceled successfully';
+  }
+
+  @Patch('scheduleMyDay')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'schedule' })
+  async scheduleMyDay(@Request() request: any) {
+    await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .scheduleMyDay(request.user);
+    return 'Day scheduled successfully';
   }
 }

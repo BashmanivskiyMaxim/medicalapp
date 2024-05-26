@@ -168,26 +168,44 @@ export class addPatientProcedureUseCases {
       ];
       const procedures = await this.procedureRepository.getProcedures();
       const appointmentsPerProcedure = 8;
-      for (const procedure of await procedures) {
-        for (let i = 0; i < appointmentsPerProcedure; i++) {
-          const patientProcedure = new PatientProcedureModel();
-          patientProcedure.doctorId = procedure.doctorId;
-          patientProcedure.patientId = 28;
-          patientProcedure.procedureId = procedure.id;
-          patientProcedure.procedureDate = new Date();
-          patientProcedure.createdDate = new Date();
-          patientProcedure.updatedDate = new Date();
-          patientProcedure.appointmentTime = appointmentTime[i];
-          patientProcedure.report = { report: 'report' };
-          patientProcedure.rating = 0;
-          this.patientProcedureRepository.createPatientProcedure(
-            patientProcedure,
-          );
+
+      const daysToSchedule = 4;
+
+      for (let dayOffset = 0; dayOffset < daysToSchedule; dayOffset++) {
+        const procedureDate = new Date();
+        procedureDate.setDate(procedureDate.getDate() + dayOffset);
+
+        for (const procedure of procedures) {
+          for (let i = 0; i < appointmentsPerProcedure; i++) {
+            const existingProcedures =
+              await this.patientProcedureRepository.getExistenseProcedure(
+                procedure,
+                procedureDate,
+                appointmentTime[i],
+              );
+
+            if (!existingProcedures) {
+              const patientProcedure = new PatientProcedureModel();
+              patientProcedure.doctorId = procedure.doctorId;
+              patientProcedure.patientId = 28;
+              patientProcedure.procedureId = procedure.id;
+              patientProcedure.procedureDate = procedureDate;
+              patientProcedure.createdDate = new Date();
+              patientProcedure.updatedDate = new Date();
+              patientProcedure.appointmentTime = appointmentTime[i];
+              patientProcedure.report = { report: 'report' };
+              patientProcedure.rating = 0;
+              await this.patientProcedureRepository.createPatientProcedure(
+                patientProcedure,
+              );
+            }
+          }
         }
       }
+
       this.logger.log(
         'DailyProceduresSchedulerStrategy',
-        'Procedures scheduled',
+        'Procedures scheduled for today and the next 3 days',
       );
     } catch (error) {
       this.logger.error(
@@ -196,6 +214,25 @@ export class addPatientProcedureUseCases {
       );
     }
   }
+
+  async scheduleDeleteProcedure() {
+    try {
+      const today = new Date();
+      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+      await this.patientProcedureRepository.deleteSchedule(
+        startOfDay,
+        endOfDay,
+      );
+    } catch (error) {
+      this.logger.error(
+        'proceduresDeleteSchedulerStrategy',
+        'Error deleting procedures',
+      );
+    }
+  }
+
   async getAll(account: any) {
     this.ensureIsAdmin(account.accountType);
     const patientProcedures =
@@ -306,23 +343,137 @@ export class addPatientProcedureUseCases {
     return result;
   }
 
-  async getTodayProceduresTimes(id: string) {
+  async getProceduresByDate(procedureId: number, date: string) {
     const patientProcedures =
-      await this.patientProcedureRepository.getPatientProceduresTimesTodayById(
-        new Date(),
-        +id,
+      await this.patientProcedureRepository.getPatientProceduresTimesByDate(
+        date,
+        procedureId,
       );
+
     if (!patientProcedures.length) {
       throw new ForbiddenException('Procedures not found');
     }
+
     const timesWithoutSeconds = patientProcedures.map((procedure) => ({
       id: procedure.id,
       appointmentTime: procedure.appointmentTime.slice(0, -3),
+      appointmentDate: procedure.appointmentDate,
     }));
     this.logger.log(
-      'getTodayProceduresUseCases execute',
-      'Today procedures times have been fetched',
+      'getProceduresByDate execute',
+      'Procedures times have been fetched',
     );
+
     return timesWithoutSeconds;
+  }
+
+  async cancelProcedure(id: string, account: any) {
+    const patientProcedure =
+      await this.patientProcedureRepository.getPatientProcedureById(+id);
+    if (!patientProcedure) {
+      throw new ForbiddenException('Patient procedure not found');
+    }
+    const patient = await this.patientRepository.getPatientByAccountId(
+      account.id,
+    );
+    if (!patient) {
+      throw new ForbiddenException('Patient not found');
+    }
+    if (patient.id !== patientProcedure.patientId) {
+      throw new ForbiddenException('Permission denied');
+    }
+    patientProcedure.updatedDate = new Date();
+    patientProcedure.report = { report: 'report' };
+    patientProcedure.patientId = 28;
+    await this.patientProcedureRepository.updatePatientProcedure(
+      +id,
+      patientProcedure,
+    );
+    this.logger.log(
+      'cancelProcedureUseCases execute',
+      'Patient procedure have been canceled',
+    );
+  }
+
+  async scheduleMyDay(account) {
+    this.ensureIsPatient(account.accountType);
+
+    const appointmentTimes = [
+      '9:00',
+      '10:00',
+      '11:00',
+      '12:00',
+      '13:00',
+      '15:00',
+      '16:00',
+      '17:00',
+    ];
+
+    const patient = await this.patientRepository.getPatientByAccountId(
+      account.id,
+    );
+    if (!patient) {
+      throw new ForbiddenException('Patient not found');
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = today.toISOString().split('T')[0];
+    let availableProcedures =
+      await this.patientProcedureRepository.getAvailableProceduresByDay(
+        todayStr,
+      );
+    availableProcedures.sort((a, b) => b.rating - a.rating);
+    const userPreferences =
+      await this.patientProcedureRepository.getUserPreferences(patient.id);
+    const scheduledProcedures = [];
+
+    for (const time of appointmentTimes) {
+      if (availableProcedures.length === 0) break;
+
+      let preferredProcedures = availableProcedures.filter((proc) =>
+        userPreferences.includes(proc.procedureId),
+      );
+
+      if (preferredProcedures.length === 0) {
+        preferredProcedures = availableProcedures;
+      }
+      const procedureToSchedule = preferredProcedures.shift();
+      scheduledProcedures.push({
+        id: procedureToSchedule.id,
+        patientId: patient.id,
+        procedureId: procedureToSchedule.procedureId,
+        appointmentTime: time,
+        procedureDate: today,
+        doctorId: procedureToSchedule.doctorId,
+      });
+
+      availableProcedures = availableProcedures.filter(
+        (proc) => proc.procedure.id !== procedureToSchedule.procedure.id,
+      );
+    }
+    for (const proc of scheduledProcedures) {
+      const patientProcedure = new PatientProcedureModel();
+      patientProcedure.doctorId = proc.doctorId;
+      patientProcedure.patientId = proc.patientId;
+      patientProcedure.procedureId = proc.procedureId;
+      patientProcedure.procedureDate = proc.procedureDate;
+      patientProcedure.createdDate = new Date();
+      patientProcedure.updatedDate = new Date();
+      patientProcedure.appointmentTime = proc.appointmentTime;
+      patientProcedure.report = { report: 'report' };
+      patientProcedure.rating = 0;
+
+      console.log(proc);
+
+      await this.patientProcedureRepository.updatePatientProcedure(
+        proc.id,
+        patientProcedure,
+      );
+    }
+    this.logger.log(
+      'scheduleMyDay',
+      `User ${patient.id} scheduled for procedures`,
+    );
   }
 }

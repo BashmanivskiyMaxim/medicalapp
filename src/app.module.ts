@@ -11,7 +11,7 @@ import { LocalStrategy } from './infrastructure/common/strategies/local.strategy
 import { JwtStrategy } from './infrastructure/common/strategies/jwt.strategies';
 import { JwtRefreshTokenStrategy } from './infrastructure/common/strategies/jwtRefresh.strategy';
 import { ScheduleModule } from '@nestjs/schedule';
-import { DailyProceduresSchedulerStrategy } from './infrastructure/common/strategies/dailyProceduresScheduler.strategy';
+import { DailyProceduresSchedulerStrategy } from './infrastructure/common/strategies/proceduresScheduler.strategy';
 
 @Module({
   imports: [

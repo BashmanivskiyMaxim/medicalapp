@@ -14,7 +14,7 @@ export class DailyProceduresSchedulerStrategy {
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async handleCron() {
+  async handleCronSchedule() {
     try {
       this.logger.log(
         'DailyProceduresSchedulerStrategy',
@@ -23,6 +23,19 @@ export class DailyProceduresSchedulerStrategy {
       this.patientProcedureUsecaseProxy.getInstance().dailyScheduleProcedure();
     } catch (error) {
       this.logger.error('DailyProceduresScheduler', error);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_11PM)
+  async handleCronDelete() {
+    try {
+      this.logger.log(
+        'proceduresDeleteSchedulerStrategy',
+        'schedule procedure deleted',
+      );
+      this.patientProcedureUsecaseProxy.getInstance().scheduleDeleteProcedure();
+    } catch (error) {
+      this.logger.error('proceduresDeleteScheduler', error);
     }
   }
 }
