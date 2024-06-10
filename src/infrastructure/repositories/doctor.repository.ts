@@ -43,13 +43,19 @@ export class DatabaseDoctorRepository
   async getDoctorById(doctorId: number): Promise<any> {
     return await this.doctorEntityRepository.findOne({
       where: { id: doctorId },
+      relations: ['account'],
+    });
+  }
+  async getDoctorByAccountId(accountId: number): Promise<any> {
+    return await this.doctorEntityRepository.findOne({
+      where: { account: { id: accountId } },
     });
   }
   async getDoctors(): Promise<any> {
     return await this.doctorEntityRepository.find();
   }
   async findByAccountId(accountId: number): Promise<any> {
-    return await this.doctorEntityRepository.findOne({
+    return await this.doctorEntityRepository.find({
       where: { account: { id: accountId } },
     });
   }
@@ -60,5 +66,22 @@ export class DatabaseDoctorRepository
   }
   async getDoctorsByIds(ids: number[]): Promise<DoctorModel[]> {
     return this.doctorEntityRepository.findByIds(ids);
+  }
+  async findByPatientProcedureId(patientProcedureId: number): Promise<any> {
+    return await this.doctorEntityRepository
+      .createQueryBuilder('doctor')
+      .innerJoin(
+        'doctor.patientProcedures',
+        'patientProcedure',
+        'patientProcedure.id = :patientProcedureId',
+        { patientProcedureId },
+      )
+      .getOne();
+  }
+
+  async findAllDoctorsByAccountId(accountId: number): Promise<any> {
+    return await this.doctorEntityRepository.find({
+      where: { account: { id: accountId } },
+    });
   }
 }

@@ -22,7 +22,7 @@ import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 import { ProcedurePresenter } from './procedure.presenter';
 import { addProcedureUseCases } from 'src/usecases/procedure/procedure.usecases';
-import { AddProcedureDto } from './procedure.dto';
+import { AddProcedureDto, UpdateProcedureDto } from './procedure.dto';
 
 @Controller('procedure')
 @ApiTags('procedure')
@@ -47,6 +47,7 @@ export class ProcedureController {
     @Body() addProcedureDto: AddProcedureDto,
     @Request() request: any,
   ) {
+    console.log('addProcedureDto', addProcedureDto);
     const procedureCreated = await this.addProcedureUseCasesProxy
       .getInstance()
       .add(addProcedureDto, request.user);
@@ -54,24 +55,38 @@ export class ProcedureController {
   }
 
   @Patch('update/:id')
+  @ApiBody({ type: UpdateProcedureDto })
+  @ApiResponse({ type: ProcedurePresenter })
+  @ApiOperation({ description: 'updateProcedure' })
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ description: 'update' })
   async updateProcedure(
-    @Request() request: any,
-    @Body() updateDto: AddProcedureDto,
     @Param('id') id: string,
+    @Body() updateProcedureDto: UpdateProcedureDto,
+    @Request() request: any,
   ) {
-    const procedureUpdated = await this.addProcedureUseCasesProxy
+    const updatedProcedure = await this.addProcedureUseCasesProxy
       .getInstance()
-      .update(updateDto, request.user, id);
-    return new ProcedurePresenter(procedureUpdated);
+      .update(
+        updateProcedureDto,
+        request.user,
+        +updateProcedureDto.doctorId,
+        id,
+      );
+    return new ProcedurePresenter(updatedProcedure);
   }
 
   @Delete('delete/:id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'delete' })
-  async deleteProcedure(@Param('id') id: string, @Request() request: any) {
-    await this.addProcedureUseCasesProxy.getInstance().delete(id, request.user);
+  async deleteProcedure(
+    @Param('id') id: string,
+    @Request() request: any,
+    @Body() body: { doctorId: number },
+  ) {
+    const { doctorId } = body;
+    await this.addProcedureUseCasesProxy
+      .getInstance()
+      .delete(id, request.user, doctorId);
     return 'Procedure deleted successfully';
   }
 
@@ -108,5 +123,15 @@ export class ProcedureController {
       .getInstance()
       .rate(id, request.user);
     return new ProcedurePresenter(procedureRated);
+  }
+
+  @Get('getDoctorProcedures')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'getDoctorProcedures' })
+  async getDoctorProcedures(@Request() request: any) {
+    const procedures = await this.addProcedureUseCasesProxy
+      .getInstance()
+      .getDoctorProcedures(request.user);
+    return procedures.map((procedure) => new ProcedurePresenter(procedure));
   }
 }

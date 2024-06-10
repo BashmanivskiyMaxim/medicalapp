@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DoctorModel } from 'src/domain/model/doctorModel';
+import { PatientModel } from 'src/domain/model/patientModel';
 import { ProcedureModel } from 'src/domain/model/procedureModel';
 
 export class PatientProcedurePresenter {
@@ -86,5 +87,44 @@ export class PatientProcedureForPatientPresenter {
     this.report = patientProcedure.report;
     this.rating = patientProcedure.rating;
     this.procedure = patientProcedure.procedure;
+  }
+}
+
+export class PatientProcedureForDoctorPresenter {
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  patient: PatientModel;
+  @ApiProperty()
+  procedureDate: string;
+  @ApiProperty()
+  updatedDate: string;
+  @ApiProperty()
+  appointmentTime: string;
+  @ApiProperty()
+  report: object;
+  @ApiProperty()
+  rating: number;
+  @ApiProperty()
+  procedure: ProcedureModel;
+
+  constructor(patientProcedure: any) {
+    this.id = patientProcedure.id;
+    this.patient = patientProcedure.patient;
+    this.procedureDate = patientProcedure.procedureDate;
+    this.updatedDate = patientProcedure.updatedDate;
+    this.appointmentTime = patientProcedure.appointmentTime;
+    this.report = patientProcedure.report;
+    this.rating = patientProcedure.rating;
+    this.procedure = patientProcedure.procedure;
+  }
+}
+
+export class ReportPresenter {
+  @ApiProperty()
+  report: object;
+
+  constructor(report: any) {
+    this.report = report;
   }
 }

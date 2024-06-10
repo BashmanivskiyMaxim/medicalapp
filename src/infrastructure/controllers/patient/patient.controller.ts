@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Inject,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -35,10 +36,10 @@ export class PatientController {
   @ApiResponse({ type: PatientPresenter })
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'createPatient' })
-  async addPatient(@Body() addPatientDto: AddPatientDto, @Req() request: any) {
+  async addPatient(@Body() addPatientDto: AddPatientDto) {
     const patientCreated = await this.addPatientUseCasesProxy
       .getInstance()
-      .execute(addPatientDto, request.user);
+      .execute(addPatientDto);
     return new PatientPresenter(patientCreated);
   }
 
@@ -62,13 +63,23 @@ export class PatientController {
     return patients;
   }
 
+  @Patch('update/:patientId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'Update patient' })
+  async updatePatient(@Req() request: any, @Body() additionalInfo: object) {
+    await this.addPatientUseCasesProxy
+      .getInstance()
+      .updatePatient(request.user, additionalInfo);
+    return 'Update successful';
+  }
+
   @Get('getMyPatientInfo')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'getMyPatientInfo' })
   async getMyPatientInfo(@Req() request: any) {
-    const patients = await this.addPatientUseCasesProxy
+    const patient = await this.addPatientUseCasesProxy
       .getInstance()
       .getMyPatientInfo(request.user);
-    return patients;
+    return patient;
   }
 }

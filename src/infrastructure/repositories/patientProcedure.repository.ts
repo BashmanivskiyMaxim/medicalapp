@@ -4,6 +4,7 @@ import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PatientProcedureModel } from 'src/domain/model/patientProcedureModel';
+import { Brackets } from 'typeorm';
 
 export class DatabasePatientProcedureRepository
   extends BaseAbstractRepository<PatientProcedureEntity>
@@ -55,6 +56,7 @@ export class DatabasePatientProcedureRepository
     );
     return this.patientProcedureEntityRepository.save(patientProcedureEntity);
   }
+
   async updatePatientProcedure(
     id: number,
     patientProcedure: any,
@@ -109,6 +111,7 @@ export class DatabasePatientProcedureRepository
       await this.patientProcedureEntityRepository.findOne({
         where: { id: patientProcedureId },
       });
+    console.log('Patient Procedure:', patientProcedureId);
     patientProcedure.report = await this.decryptReport(
       patientProcedure.report,
       process.env.ENCRYPTION_KEY,
@@ -123,18 +126,226 @@ export class DatabasePatientProcedureRepository
       where: { procedure: { id: procedureId } },
     });
   }
-  async getPatientProceduresByDoctorId(doctorId: number): Promise<any> {
-    const patientProcedures = await this.patientProcedureEntityRepository.find({
-      where: { doctor: { id: doctorId } },
-    });
-    for (const patientProcedure of patientProcedures) {
-      patientProcedure.report = await this.decryptReport(
-        patientProcedure.report,
-        process.env.ENCRYPTION_KEY,
+  async getPastProceduresByDoctorId(
+    doctorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const today = new Date();
+    const [patientProcedures, total] =
+      await this.patientProcedureEntityRepository
+        .createQueryBuilder('patientProcedure')
+        .leftJoinAndSelect('patientProcedure.patient', 'patient')
+        .leftJoinAndSelect('patient.account', 'patientAccount')
+        .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
+        .where('patientProcedure.doctorId = :doctorId', { doctorId })
+        .andWhere('patientProcedure.procedureDate < :today', { today })
+        .andWhere(
+          'patientProcedure.patientId NOT IN (:...excludedPatientIds)',
+          { excludedPatientIds: [28, 29] },
+        )
+        .select([
+          'patientProcedure',
+          'patient.id',
+          'patientAccount.email',
+          'patientAccount.firstName',
+          'patientAccount.lastName',
+          'procedure.id',
+          'procedure.procedureName',
+          'procedure.procedureDescription',
+        ])
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount();
+
+    const decryptedReports = await Promise.all(
+      patientProcedures.map(async (patientProcedure) => {
+        patientProcedure.report = await this.decryptReport(
+          patientProcedure.report,
+          process.env.ENCRYPTION_KEY,
+        );
+        return patientProcedure;
+      }),
+    );
+
+    return { data: decryptedReports, total };
+  }
+
+  async searchProceduresByKeyWord(
+    keyword: string,
+    accountId: number,
+    accountType: 'patient' | 'doctor',
+  ): Promise<[any[], number]> {
+    const queryBuilder = this.patientProcedureEntityRepository
+      .createQueryBuilder('patientProcedure')
+      .leftJoinAndSelect('patientProcedure.patient', 'patient')
+      .leftJoinAndSelect('patient.account', 'patientAccount')
+      .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
+      .select([
+        'patientProcedure',
+        'patient.id',
+        'patientAccount.email',
+        'patientAccount.firstName',
+        'patientAccount.lastName',
+        'procedure.id',
+        'procedure.procedureName',
+        'procedure.procedureDescription',
+      ]);
+
+    queryBuilder.where(
+      new Brackets((qb) => {
+        qb.where('procedure.procedureName LIKE :keyword', {
+          keyword: `%${keyword}%`,
+        })
+          .orWhere('procedure.procedureDescription LIKE :keyword', {
+            keyword: `%${keyword}%`,
+          })
+          .orWhere('patientAccount.firstName LIKE :keyword', {
+            keyword: `%${keyword}%`,
+          })
+          .orWhere('patientAccount.lastName LIKE :keyword', {
+            keyword: `%${keyword}%`,
+          })
+          .orWhere('patientAccount.email LIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
+      }),
+    );
+
+    if (accountType === 'patient') {
+      queryBuilder.andWhere('patient.id = :accountId', { accountId });
+      queryBuilder.andWhere(
+        'patientProcedure.patientId NOT IN (:...excludedPatientIds)',
+        {
+          excludedPatientIds: [28, 29],
+        },
+      );
+    } else if (accountType === 'doctor') {
+      queryBuilder.andWhere('patientProcedure.doctorId = :accountId', {
+        accountId,
+      });
+      queryBuilder.andWhere(
+        'patientProcedure.patientId NOT IN (:...excludedPatientIds)',
+        {
+          excludedPatientIds: [28, 29],
+        },
       );
     }
-    return patientProcedures;
+
+    const [result, total] = await queryBuilder.getManyAndCount();
+
+    let decryptedReports = [];
+    if (result.length > 0) {
+      decryptedReports = await Promise.all(
+        result.map(async (patientProcedure) => {
+          if (patientProcedure.report) {
+            try {
+              patientProcedure.report = await this.decryptReport(
+                patientProcedure.report,
+                process.env.ENCRYPTION_KEY,
+              );
+            } catch (error) {
+              console.error('Error decrypting report:', error);
+              throw error;
+            }
+          }
+          return patientProcedure;
+        }),
+      );
+    }
+
+    return [decryptedReports, total];
   }
+  async getTodayProceduresByDoctorId(
+    doctorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const today = new Date().toISOString().split('T')[0];
+    const [patientProcedures, total] =
+      await this.patientProcedureEntityRepository
+        .createQueryBuilder('patientProcedure')
+        .leftJoinAndSelect('patientProcedure.patient', 'patient')
+        .leftJoinAndSelect('patient.account', 'patientAccount')
+        .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
+        .where('patientProcedure.doctorId = :doctorId', { doctorId })
+        .andWhere('DATE(patientProcedure.procedureDate) = :today', { today })
+        .andWhere(
+          'patientProcedure.patientId NOT IN (:...excludedPatientIds)',
+          { excludedPatientIds: [28, 29] },
+        )
+        .select([
+          'patientProcedure',
+          'patient.id',
+          'patientAccount.email',
+          'patientAccount.firstName',
+          'patientAccount.lastName',
+          'procedure.id',
+          'procedure.procedureName',
+          'procedure.procedureDescription',
+        ])
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount();
+
+    const decryptedReports = await Promise.all(
+      patientProcedures.map(async (patientProcedure) => {
+        patientProcedure.report = await this.decryptReport(
+          patientProcedure.report,
+          process.env.ENCRYPTION_KEY,
+        );
+        return patientProcedure;
+      }),
+    );
+
+    return { data: decryptedReports, total };
+  }
+
+  async getFutureProceduresByDoctorId(
+    doctorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const today = new Date();
+    const [patientProcedures, total] =
+      await this.patientProcedureEntityRepository
+        .createQueryBuilder('patientProcedure')
+        .leftJoinAndSelect('patientProcedure.patient', 'patient')
+        .leftJoinAndSelect('patient.account', 'patientAccount')
+        .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
+        .where('patientProcedure.doctorId = :doctorId', { doctorId })
+        .andWhere('patientProcedure.procedureDate > :today', { today })
+        .andWhere(
+          'patientProcedure.patientId NOT IN (:...excludedPatientIds)',
+          { excludedPatientIds: [28, 29] },
+        )
+        .select([
+          'patientProcedure',
+          'patient.id',
+          'patientAccount.email',
+          'patientAccount.firstName',
+          'patientAccount.lastName',
+          'procedure.id',
+          'procedure.procedureName',
+          'procedure.procedureDescription',
+        ])
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount();
+
+    const decryptedReports = await Promise.all(
+      patientProcedures.map(async (patientProcedure) => {
+        patientProcedure.report = await this.decryptReport(
+          patientProcedure.report,
+          process.env.ENCRYPTION_KEY,
+        );
+        return patientProcedure;
+      }),
+    );
+
+    return { data: decryptedReports, total };
+  }
+
   async getPatientProceduresTimesByDate(
     date: string,
     procedureId: number,
@@ -148,36 +359,30 @@ export class DatabasePatientProcedureRepository
       .andWhere('DATE(patientProcedure.procedureDate) = DATE(:formattedDate)', {
         formattedDate,
       })
+      .select([
+        'patientProcedure.id',
+        'patientProcedure.appointmentTime',
+        'patientProcedure.procedureDate',
+      ])
       .getMany();
 
-    return patientProcedures.map((patientProcedure) => ({
-      id: patientProcedure.id,
-      appointmentTime: patientProcedure.appointmentTime,
-      appointmentDate: patientProcedure.procedureDate,
-    }));
+    return patientProcedures;
   }
   async getExistenseProcTodayByPatientId(
     patientId: number,
-    patientProcedureId: number,
+    procedureDate: string,
+    //procedureId: number,
   ): Promise<any> {
-    const todayDate = new Date().toISOString().split('T')[0];
-    const patientProcedure =
-      await this.patientProcedureEntityRepository.findOne({
-        where: {
-          id: patientProcedureId,
-        },
-      });
-    const patientProcedures = await this.patientProcedureEntityRepository
-      .createQueryBuilder('patientProcedure')
-      .where('patientProcedure.patientId = :patientId', { patientId })
-      .andWhere('DATE(patientProcedure.procedureDate) = DATE(:todayDate)', {
-        todayDate,
-      })
-      .andWhere('patientProcedure.procedureId = :procedureId', {
-        procedureId: patientProcedure.procedureId,
-      })
-      .getOne();
-    return patientProcedures;
+    const date = new Date(procedureDate).toISOString().split('T')[0];
+
+    return (
+      this.patientProcedureEntityRepository
+        .createQueryBuilder('procedure')
+        .where('procedure.patientId = :patientId', { patientId })
+        //.andWhere('procedure.procedureId = :procedureId', { procedureId })
+        .andWhere('DATE(procedure.procedureDate) = :date', { date })
+        .getOne()
+    );
   }
 
   async deleteSchedule(startOfDay: Date, endOfDay: Date) {
@@ -209,7 +414,7 @@ export class DatabasePatientProcedureRepository
     });
   }
   async getAvailableProceduresByDay(todayDate: string): Promise<any> {
-    const patientProcedures = await this.patientProcedureEntityRepository
+    return this.patientProcedureEntityRepository
       .createQueryBuilder('patientProcedure')
       .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
       .where('DATE(patientProcedure.procedureDate) = DATE(:todayDate)', {
@@ -217,17 +422,69 @@ export class DatabasePatientProcedureRepository
       })
       .andWhere('patientProcedure.patientId = :patientId', { patientId: 28 })
       .select([
+        'patientProcedure.id',
+        'patientProcedure.procedureDate',
+        'patientProcedure.appointmentTime',
+        'procedure.id',
+        'procedure.procedureName',
+        'procedure.procedureDescription',
+      ])
+      .getMany();
+  }
+  async getUserPreferences(patientId: number): Promise<any> {
+    return await this.patientProcedureEntityRepository.find({
+      where: { patientId },
+    });
+  }
+  async getProceduresByDoctorAndTime(
+    doctorId: number,
+    appointmentTime: string,
+    procedureDate: string,
+  ): Promise<PatientProcedureModel[]> {
+    const date = new Date(procedureDate).toISOString().split('T')[0];
+
+    return this.patientProcedureEntityRepository
+      .createQueryBuilder('procedure')
+      .where('procedure.doctorId = :doctorId', { doctorId })
+      .andWhere('procedure.appointmentTime = :appointmentTime', {
+        appointmentTime,
+      })
+      .andWhere('DATE(procedure.procedureDate) = :date', { date })
+      .getMany();
+  }
+
+  async getInactiveProceduresByDoctorAndTime(
+    doctorId: number,
+    appointmentTime: string,
+    procedureDate: string,
+  ): Promise<PatientProcedureModel[]> {
+    const date = new Date(procedureDate).toISOString().split('T')[0];
+    return this.patientProcedureEntityRepository
+      .createQueryBuilder('procedure')
+      .where('procedure.doctorId = :doctorId', { doctorId })
+      .andWhere('procedure.appointmentTime = :appointmentTime', {
+        appointmentTime,
+      })
+      .andWhere('DATE(procedure.procedureDate) = :date', { date })
+      .andWhere('procedure.patientId = 29')
+      .getMany();
+  }
+
+  async getTodayPatientProcedures(patientId: number): Promise<any> {
+    const today = new Date().toISOString().split('T')[0];
+    return this.patientProcedureEntityRepository
+      .createQueryBuilder('patientProcedure')
+      .leftJoinAndSelect('patientProcedure.procedure', 'procedure')
+      .where('patientProcedure.patientId = :patientId', { patientId })
+      .andWhere('DATE(patientProcedure.procedureDate) = DATE(:today)', {
+        today,
+      })
+      .select([
         'patientProcedure',
         'procedure.id',
         'procedure.procedureName',
         'procedure.procedureDescription',
       ])
       .getMany();
-    return patientProcedures;
-  }
-  async getUserPreferences(patientId: number): Promise<any> {
-    return await this.patientProcedureEntityRepository.find({
-      where: { patientId },
-    });
   }
 }

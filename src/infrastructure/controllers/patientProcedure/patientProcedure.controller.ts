@@ -22,10 +22,12 @@ import {
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
 import {
+  PatientProcedureForDoctorPresenter,
   PatientProcedureForPatientPresenter,
   PatientProcedurePickPresenter,
   PatientProcedurePresenter,
   PatientProcedureTimesPresenter,
+  ReportPresenter,
 } from './patientProcedure.presenter';
 import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 import { addPatientProcedureUseCases } from 'src/usecases/PatientProcedure/patientProcedure.usecases';
@@ -122,16 +124,84 @@ export class PatientProcedureController {
     );
   }
 
-  @Get('getDoctorProcedures')
-  @UseGuards(JwtAuthGuard)
+  @Get('getTodayPatientProcedures/:id')
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'get' })
-  async getDoctorProcedures(@Request() request: any) {
+  async getTodayPatientProcedures(@Param('id') id: string) {
     const patientProcedures = await this.addPatientProcedureUseCasesProxy
       .getInstance()
-      .getDoctorProcedures(request.user);
+      .getTodayPatientProcedures(+id);
+
     return patientProcedures.map(
-      (patientProcedure) => new PatientProcedurePresenter(patientProcedure),
+      (patientProcedure) =>
+        new PatientProcedureTimesPresenter(patientProcedure),
     );
+  }
+
+  @Get('getDoctorProcedures')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'Get doctor procedures with pagination' })
+  async getDoctorProcedures(
+    @Request() request: any,
+    @Query('category') category: 'past' | 'today' | 'future',
+    @Query('page') page: number = 1,
+    @Query('pageSize') pageSize: number = 10,
+  ) {
+    try {
+      const patientProcedures = await this.addPatientProcedureUseCasesProxy
+        .getInstance()
+        .getDoctorProcedures(request.user, category, page, pageSize);
+
+      const combinedProcedures = patientProcedures.doctorProcedures.map(
+        (patientProcedure) =>
+          new PatientProcedureForDoctorPresenter(patientProcedure),
+      );
+
+      return {
+        data: combinedProcedures,
+        total: patientProcedures.total,
+      };
+    } catch (error) {
+      console.error('Error fetching doctor procedures:', error);
+      throw error;
+    }
+  }
+
+  @Get('getPatientInfo/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getPatientInfo(@Param('id') id: string, @Request() request: any) {
+    const patientInfo = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getPatientInfoByProcedureId(+id, request.user);
+    return patientInfo;
+  }
+
+  @Get('searchProcedures')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'search doctor procedures' })
+  async searchProcedures(
+    @Query('keyword') keyword: string,
+    @Request() request: any,
+  ) {
+    const procedures = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .searchProcedures(keyword, request.user);
+
+    console.log('Procedures:', procedures.data);
+    if (!procedures) {
+      return {
+        data: [],
+        total: 0,
+      };
+    }
+    return {
+      data: procedures.data.map(
+        (patientProcedure) =>
+          new PatientProcedureForDoctorPresenter(patientProcedure),
+      ),
+      total: procedures.total,
+    };
   }
 
   @Patch('rate/:id')
@@ -160,6 +230,16 @@ export class PatientProcedureController {
       .getInstance()
       .reportProcedure(id, report, request.user);
     return new PatientProcedurePresenter(patientProcedure);
+  }
+
+  @Get('getReport/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'get' })
+  async getReport(@Param('id') id: string, @Request() request: any) {
+    const patientProcedureReport = await this.addPatientProcedureUseCasesProxy
+      .getInstance()
+      .getReport(id, request.user);
+    return new ReportPresenter(patientProcedureReport);
   }
 
   @Get('todayProcedures/:id')

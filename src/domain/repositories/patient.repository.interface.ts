@@ -7,4 +7,5 @@ export interface PatientRepository {
   getPatient(patientId: number): Promise<any>;
   getPatients(doctorId: number): Promise<any>;
   getPatientByAccountId(accountId: number): Promise<any>;
+  getPatientById(patientId: number): Promise<any>;
 }

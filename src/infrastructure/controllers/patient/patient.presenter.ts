@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PatientModel } from 'src/domain/model/patientModel';
 
 export class PatientPresenter {
   @ApiProperty()
@@ -11,9 +10,9 @@ export class PatientPresenter {
   @ApiProperty()
   recovery_status: boolean;
   @ApiProperty()
-  additional_info: object | string;
+  additional_info: object;
 
-  constructor(patient: PatientModel) {
+  constructor(patient: any) {
     this.id = patient.id;
     this.accountId = patient.accountId;
     this.recovery_status = patient.recovery_status;

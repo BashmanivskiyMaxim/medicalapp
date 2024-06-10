@@ -21,20 +21,15 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  // Filter
   app.useGlobalFilters(new AllExceptionFilter(new LoggerService()));
 
-  // pipes
   app.useGlobalPipes(new ValidationPipe());
 
-  // interceptors
   app.useGlobalInterceptors(new LoggingInterceptor(new LoggerService()));
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  // base routing
   app.setGlobalPrefix('api_v1');
 
-  // swagger config
   if (env !== 'production') {
     const config = new DocumentBuilder()
       .addBearerAuth()
@@ -49,6 +44,6 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
   console.log('PORT:', process.env.PORT);
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

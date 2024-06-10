@@ -24,6 +24,9 @@ export class ProcedureEntity {
   @Column({ name: 'average_rating', type: 'double precision' })
   averageRating: number;
 
+  @Column({ default: false })
+  deleted: boolean;
+
   @ManyToOne(() => DoctorEntity, (doctor) => doctor.procedures)
   @JoinColumn({ name: 'doctor_id' })
   doctor: DoctorEntity;

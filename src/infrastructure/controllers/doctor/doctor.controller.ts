@@ -22,7 +22,7 @@ import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-
 import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
 import { DoctorPresenter } from './doctor.presenter';
 import { addDoctorUseCases } from 'src/usecases/doctor/doctor.usecases';
-import { AddDoctorDto } from './doctor.dto';
+import { AddDoctorDto, UpdateDoctorDto } from './doctor.dto';
 import { JwtAuthGuard } from 'src/infrastructure/common/guards/jwtAuth.guard';
 
 @Controller('doctor')
@@ -42,7 +42,7 @@ export class DoctorController {
   @Post('add')
   @ApiBody({ type: AddDoctorDto })
   @ApiResponse({ type: DoctorPresenter })
-  @ApiOperation({ description: 'createdoctor' })
+  @ApiOperation({ description: 'create doctor' })
   @UseGuards(JwtAuthGuard)
   async addDoctor(@Body() addDoctorDto: AddDoctorDto, @Request() request: any) {
     const doctorCreated = await this.addDoctorUseCasesProxy
@@ -56,20 +56,22 @@ export class DoctorController {
   @ApiOperation({ description: 'update' })
   async updateDoctor(
     @Req() request: any,
-    @Body() updateDto: AddDoctorDto,
+    @Body() updateDto: UpdateDoctorDto,
     @Param('id') id: string,
   ) {
     await this.addDoctorUseCasesProxy
       .getInstance()
-      .updateDoctorInfo(id, updateDto, request.user);
+      .updateDoctorInfo(+id, updateDto, request.user);
     return 'Update successful';
   }
 
-  @Delete('delete')
+  @Delete('delete/:doctorId')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'delete' })
-  async deleteDoctor(@Req() request: any) {
-    await this.addDoctorUseCasesProxy.getInstance().deleteDoctor(request.user);
+  async deleteDoctor(@Req() request: any, @Param('doctorId') doctorId: string) {
+    await this.addDoctorUseCasesProxy
+      .getInstance()
+      .deleteDoctor(doctorId, request.user);
     return 'Delete successful';
   }
 
@@ -80,6 +82,26 @@ export class DoctorController {
     const doctors = await this.addDoctorUseCasesProxy
       .getInstance()
       .getDoctors(request.user.accountType);
+    return doctors;
+  }
+
+  @Get('getMyDoctorInfo')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'getMyDoctorInfo' })
+  async getMyDoctorInfo(@Req() request: any) {
+    const doctors = await this.addDoctorUseCasesProxy
+      .getInstance()
+      .getMyDoctorInfo(request.user);
+    return doctors;
+  }
+
+  @Get('getAllDoctors')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'getAllDoctors' })
+  async getAllDoctors(@Req() request: any) {
+    const doctors = await this.addDoctorUseCasesProxy
+      .getInstance()
+      .getDoctorsByAccount(request.user);
     return doctors;
   }
 }

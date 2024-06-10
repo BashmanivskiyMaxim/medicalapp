@@ -6,6 +6,7 @@ export class ProcedureModel {
   procedureName?: string;
   procedureDescription?: string;
   averageRating?: number;
+  deleted?: boolean;
 }
 
 export class ProcedureModelWithDoctorUsername extends ProcedureModel {

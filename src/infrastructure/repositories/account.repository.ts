@@ -96,4 +96,12 @@ export class DatabaseAccountRepository
   deleteAccountById(id: string): Promise<any> {
     return this.AccountEntityRepository.delete(id);
   }
+
+  async changeAccountType(id: string, accountType: string): Promise<any> {
+    return this.AccountEntityRepository.update(id, { accountType });
+  }
+
+  async getAllAccounts(): Promise<any> {
+    return this.AccountEntityRepository.find();
+  }
 }

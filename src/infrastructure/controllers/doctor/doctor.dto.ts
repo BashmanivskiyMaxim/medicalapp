@@ -9,3 +9,12 @@ export class AddDoctorDto {
   @IsString()
   readonly qualification: string;
 }
+
+export class UpdateDoctorDto {
+  @ApiProperty({ required: true })
+  @IsString()
+  readonly specialty: string;
+  @ApiProperty({ required: true })
+  @IsString()
+  readonly qualification: string;
+}

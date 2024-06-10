@@ -12,11 +12,6 @@ export interface PatientProcedureRepository {
   getPatientProcedureById(patientProcedureId: number): Promise<any>;
   getAllProcedures(): Promise<any>;
   getPatientProceduresByProcedureId(procedureId: number): Promise<any>;
-  getPatientProceduresByDoctorId(doctorId: number): Promise<any>;
-  getExistenseProcTodayByPatientId(
-    patientId: number,
-    procedureId: number,
-  ): Promise<any>;
   getPatientProceduresTimesByDate(
     date: string,
     procedureId: number,
@@ -29,4 +24,40 @@ export interface PatientProcedureRepository {
   ): Promise<any>;
   getAvailableProceduresByDay(today: string): Promise<any>;
   getUserPreferences(patientId: number): Promise<any>;
+  getProceduresByDoctorAndTime(
+    doctorId: number,
+    appointmentTime: string,
+    procedureDate: string,
+  ): Promise<any>;
+  getInactiveProceduresByDoctorAndTime(
+    doctorId: number,
+    appointmentTime: string,
+    procedureDate: string,
+  ): Promise<any>;
+  getExistenseProcTodayByPatientId(
+    patientId: number,
+    procedureDate: string,
+    //procedureId: number,
+  ): Promise<any>;
+  getTodayProceduresByDoctorId(
+    doctorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<any>;
+  getFutureProceduresByDoctorId(
+    doctorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<any>;
+  getPastProceduresByDoctorId(
+    doctorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<any>;
+  searchProceduresByKeyWord(
+    keyword: string,
+    id: number,
+    accountType: string,
+  ): Promise<any>;
+  getTodayPatientProcedures(patientId: number): Promise<any>;
 }

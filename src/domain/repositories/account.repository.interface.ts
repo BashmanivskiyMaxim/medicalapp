@@ -10,4 +10,6 @@ export interface AccountRepository {
   updateLastLogin(username: string): Promise<void>;
   updateRefreshToken(username: string, refreshToken: string): Promise<void>;
   findAccountByUsername(username: string): Promise<any>;
+  changeAccountType(id: string, accountType: string): Promise<void>;
+  getAllAccounts(): Promise<any>;
 }

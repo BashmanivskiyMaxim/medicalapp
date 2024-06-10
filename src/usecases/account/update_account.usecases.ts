@@ -25,4 +25,25 @@ export class UpdateAccountUseCases {
       throw new NotFoundException(`Account with id ${id} not found`);
     }
   }
+
+  async changeRole(id: string, adminAccount: any) {
+    const account = await this.userRepository.findAccountById(+id);
+    if (!account) {
+      throw new NotFoundException(`Account with id ${id} not found`);
+    }
+    if (adminAccount.accountType !== 'admin') {
+      throw new NotFoundException(
+        'Permission denied. Only admin can execute this operation.',
+      );
+    }
+    const updatedAccount = await this.userRepository.changeAccountType(
+      id,
+      'user',
+    );
+    this.logger.log(
+      'UpdateAccountUseCases execute',
+      'Update role account have been inserted',
+    );
+    return updatedAccount;
+  }
 }

@@ -7,7 +7,8 @@ import { JWTConfig } from 'src/domain/config/jwt.interface';
 import { ILogger } from 'src/domain/logger/logger.interface';
 import { UserM } from '../../domain/model/accountModel';
 import { AccountRepository } from '../../domain/repositories/account.repository.interface';
-import { ForbiddenException, ConflictException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
+import { PatientRepository } from 'src/domain/repositories/patient.repository.interface';
 
 export class addAccountUseCases {
   constructor(
@@ -16,8 +17,9 @@ export class addAccountUseCases {
     private readonly jwtConfig: JWTConfig,
     private readonly userRepository: AccountRepository,
     private readonly bcryptService: IBcryptService,
+    private readonly patientRepository: PatientRepository,
   ) {}
-  async execute(data: UserM, isAdmin?: string): Promise<UserM> {
+  async execute(data: UserM): Promise<UserM> {
     const hashedPassword = await this.bcryptService.hash(data.password);
 
     const account = new UserM();
@@ -29,26 +31,15 @@ export class addAccountUseCases {
     account.createDate = new Date();
     account.updatedDate = new Date();
     account.lastLogin = new Date();
-
-    if (isAdmin === 'admin') account.accountType = 'doctor';
-    else account.accountType = 'user';
+    account.accountType = 'user';
 
     const result = await this.userRepository.createAccount(account);
+
     this.logger.log(
       'addAccountUseCases execute',
       'New account have been inserted',
     );
     return result;
-  }
-
-  async executeDoctor(data: UserM, isAdmin?: string): Promise<UserM> {
-    if (isAdmin === 'admin') {
-      return this.execute(data, 'admin');
-    } else {
-      throw new ForbiddenException(
-        'Permission denied. Only administrators can execute this operation.',
-      );
-    }
   }
 
   async checkUserUniqueness(username: string, email: string) {

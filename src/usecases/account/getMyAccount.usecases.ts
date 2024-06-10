@@ -23,4 +23,9 @@ export class GetAccountUseCases {
       throw new NotFoundException(`Account with id ${id} not found`);
     }
   }
+  async getAllAccounts(accountType: string) {
+    if (accountType === 'admin') {
+      return await this.userRepository.getAllAccounts();
+    }
+  }
 }

@@ -60,6 +60,7 @@ export class DatabaseMessageRepository
   async getMessages(receiverId: number): Promise<any> {
     const messages = await this.messageEntityRepository.find({
       where: { receiver: { id: receiverId } },
+      relations: ['sender', 'receiver'],
     });
     for (const message of messages) {
       message.messageContent = await this.decryptMessage(

@@ -18,7 +18,8 @@ export class DatabaseProcedureRepository
   ) {
     super(procedureEntityRepository);
   }
-  createProcedure(procedure: ProcedureModel): Promise<any> {
+
+  async createProcedure(procedure: ProcedureModel): Promise<any> {
     const procedureEntity = this.procedureEntityRepository.create({
       doctor: { id: procedure.doctorId },
       procedureName: procedure.procedureName,
@@ -27,45 +28,53 @@ export class DatabaseProcedureRepository
     });
     return this.procedureEntityRepository.save(procedureEntity);
   }
+
   async updateProcedure(id: number, procedure: ProcedureModel): Promise<any> {
     return this.procedureEntityRepository.save({
-      id: id,
+      id,
       ...procedure,
     });
   }
-  deleteProcedure(procedureId: number): Promise<any> {
-    return this.procedureEntityRepository.delete(procedureId);
-  }
-  async getProcedure(procedureId: number): Promise<any> {
-    return await this.procedureEntityRepository.findOne({
-      where: { id: procedureId },
+
+  async deleteProcedure(procedureId: number): Promise<any> {
+    return this.procedureEntityRepository.update(procedureId, {
+      deleted: true,
     });
   }
+
+  async getProcedure(procedureId: number): Promise<any> {
+    return this.procedureEntityRepository.findOne({
+      where: { id: procedureId, deleted: false },
+    });
+  }
+
   async getProcedures(): Promise<any> {
-    return await this.procedureEntityRepository.find();
+    return this.procedureEntityRepository.find({
+      where: { deleted: false },
+    });
   }
 
   async getProcedureByDoctorId(doctorId: number): Promise<any> {
-    return await this.procedureEntityRepository.find({
-      where: { doctor: { id: doctorId } },
+    return this.procedureEntityRepository.find({
+      where: { doctor: { id: doctorId }, deleted: false },
     });
   }
 
   async getProcedureByProcedureName(procedureName: string): Promise<any> {
-    return await this.procedureEntityRepository.find({
-      where: { procedureName: procedureName },
+    return this.procedureEntityRepository.find({
+      where: { procedureName, deleted: false },
     });
   }
 
   async getProcedureById(id: number): Promise<any> {
-    return await this.procedureEntityRepository.findOne({
-      where: { id: id },
+    return this.procedureEntityRepository.findOne({
+      where: { id, deleted: false },
     });
   }
 
   async getDoctorByProcedureId(procedureId: number): Promise<any> {
-    return await this.procedureEntityRepository.findOne({
-      where: { id: procedureId },
+    return this.procedureEntityRepository.findOne({
+      where: { id: procedureId, deleted: false },
       relations: ['doctor'],
     });
   }
@@ -76,6 +85,7 @@ export class DatabaseProcedureRepository
              d.id AS doctor_id, d.specialty, d.qualification, d.account_id
       FROM public.procedure p
       JOIN public.doctor d ON p.doctor_id = d.id
+      WHERE p.deleted = false
     `;
 
     const result = await this.procedureEntityRepository.query(query);
@@ -92,7 +102,18 @@ export class DatabaseProcedureRepository
       },
     }));
   }
+
   async findForAll(options: any): Promise<any> {
-    return await this.procedureEntityRepository.find(options);
+    return this.procedureEntityRepository.find({
+      ...options,
+      where: { ...options.where, deleted: false },
+    });
+  }
+
+  async getProceduresByDoctorId(doctorId: number): Promise<any> {
+    return this.procedureEntityRepository.find({
+      where: { doctor: { id: doctorId }, deleted: false },
+      relations: ['doctor'],
+    });
   }
 }

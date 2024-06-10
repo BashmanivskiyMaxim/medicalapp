@@ -71,17 +71,23 @@ export class UsecasesProxyModule {
       module: UsecasesProxyModule,
       providers: [
         {
-          inject: [LoggerService, DatabaseDoctorRepository],
+          inject: [
+            LoggerService,
+            DatabaseDoctorRepository,
+            DatabaseAccountRepository,
+          ],
           provide: UsecasesProxyModule.POST_DOCTOR_USECASES_PROXY,
           useFactory: (
             loggerService: LoggerService,
             databaseDoctorRepository: DatabaseDoctorRepository,
+            databaseAccountRepository: DatabaseAccountRepository,
           ) =>
             new UseCaseProxy(
               new addDoctorUseCases(
                 loggerService,
                 databaseDoctorRepository,
                 new EntityValidator(databaseDoctorRepository),
+                databaseAccountRepository,
               ),
             ),
         },
@@ -153,6 +159,7 @@ export class UsecasesProxyModule {
             EnvironmentConfigService,
             DatabaseAccountRepository,
             BcryptService,
+            DatabasePatientRepository,
           ],
           provide: UsecasesProxyModule.POST_ACCOUNT_USECASES_PROXY,
           useFactory: (
@@ -161,6 +168,7 @@ export class UsecasesProxyModule {
             config: EnvironmentConfigService,
             userRepo: DatabaseAccountRepository,
             bcryptService: BcryptService,
+            databasePatientRepository: DatabasePatientRepository,
           ) =>
             new UseCaseProxy(
               new addAccountUseCases(
@@ -169,6 +177,7 @@ export class UsecasesProxyModule {
                 config,
                 userRepo,
                 bcryptService,
+                databasePatientRepository,
               ),
             ),
         },

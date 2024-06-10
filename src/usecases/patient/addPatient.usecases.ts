@@ -28,11 +28,13 @@ export class addPatientUseCases {
       );
     }
   }
-  async execute(data: PatientModel, account: any): Promise<PatientModel> {
+  async execute(account: any): Promise<PatientModel> {
     const patient = new PatientModel();
     patient.accountId = account.id;
     patient.recovery_status = false;
-    patient.additional_info = data.additional_info;
+    patient.additional_info = {
+      content: '<p>Додаткова інформація</p>',
+    };
     const result = await this.patientRepository.createPatient(patient);
     this.logger.log(
       'addPatientUseCases execute',
@@ -76,5 +78,19 @@ export class addPatientUseCases {
       );
     }
     return patient;
+  }
+
+  async updatePatient(account: any, addInfo: any): Promise<void> {
+    const patient = await this.patientRepository.getPatientByAccountId(
+      +account.id,
+    );
+    if (!patient) {
+      throw new ForbiddenException(
+        'Permission denied. Patient does not exist.',
+      );
+    }
+    patient.additional_info = addInfo;
+
+    await this.patientRepository.updatePatient(patient);
   }
 }

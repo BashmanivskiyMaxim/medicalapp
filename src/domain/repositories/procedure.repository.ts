@@ -12,4 +12,5 @@ export interface ProcedureRepository {
   getDoctorByProcedureId(procedureId: number): Promise<any>;
   getProceduresWithDoctors(): Promise<any>;
   findForAll(options: any): Promise<any>;
+  getProceduresByDoctorId(doctorId: number): Promise<any>;
 }
